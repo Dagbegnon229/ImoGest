@@ -135,7 +135,7 @@ export default function ClientPaymentsPage() {
     // Simulate a short processing delay
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    updatePayment(nextPending.id, {
+    await updatePayment(nextPending.id, {
       status: "completed",
       method: selectedMethod,
       paidAt: new Date().toISOString(),

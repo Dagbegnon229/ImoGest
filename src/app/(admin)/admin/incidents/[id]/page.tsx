@@ -94,7 +94,7 @@ export default function IncidentDetailPage() {
       .map((a) => ({ value: a.id, label: `${a.firstName} ${a.lastName}` })),
   ];
 
-  function handleSave() {
+  async function handleSave() {
     const updates: Record<string, unknown> = {
       status,
       priority,
@@ -105,7 +105,7 @@ export default function IncidentDetailPage() {
       updates.resolvedAt = new Date().toISOString();
     }
 
-    updateIncident(incidentId, updates);
+    await updateIncident(incidentId, updates);
     showToast("Incident mis \u00e0 jour", "success");
   }
 

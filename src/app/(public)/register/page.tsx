@@ -53,7 +53,7 @@ export default function RegisterPage() {
     setIsSubmitting(true);
 
     try {
-      const application = addApplication({
+      const application = await addApplication({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim(),

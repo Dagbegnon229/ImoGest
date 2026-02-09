@@ -68,13 +68,13 @@ function CreateAdminContent() {
     return Object.keys(e).length === 0;
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
     setIsSubmitting(true);
 
     try {
-      const newAdmin = addAdmin({
+      const newAdmin = await addAdmin({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim(),

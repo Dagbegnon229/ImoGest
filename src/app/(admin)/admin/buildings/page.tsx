@@ -34,26 +34,26 @@ export default function BuildingsPage() {
     return { occupied, total: apts.length };
   }
 
-  function handleAdd(data: Omit<Building, "id" | "createdAt">) {
-    addBuilding(data);
+  async function handleAdd(data: Omit<Building, "id" | "createdAt">) {
+    await addBuilding(data);
     setShowModal(false);
     showToast("Immeuble cr\u00e9\u00e9 avec succ\u00e8s", "success");
   }
 
-  function handleEdit(data: Omit<Building, "id" | "createdAt">) {
+  async function handleEdit(data: Omit<Building, "id" | "createdAt">) {
     if (!editingBuilding) return;
-    updateBuilding(editingBuilding.id, data);
+    await updateBuilding(editingBuilding.id, data);
     setEditingBuilding(null);
     showToast("Immeuble mis \u00e0 jour", "success");
   }
 
-  function handleDelete(id: string) {
+  async function handleDelete(id: string) {
     const apts = apartments.filter((a) => a.buildingId === id);
     if (apts.length > 0) {
       showToast("Impossible de supprimer un immeuble avec des appartements", "error");
       return;
     }
-    deleteBuilding(id);
+    await deleteBuilding(id);
     showToast("Immeuble supprim\u00e9", "success");
   }
 

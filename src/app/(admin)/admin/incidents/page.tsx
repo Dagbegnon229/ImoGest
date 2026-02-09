@@ -85,8 +85,8 @@ export default function IncidentsPage() {
     return "--";
   }
 
-  function handleAdd(data: Omit<Incident, "id" | "createdAt">) {
-    addIncident({
+  async function handleAdd(data: Omit<Incident, "id" | "createdAt">) {
+    await addIncident({
       ...data,
       reportedBy: user?.id ?? "",
     });

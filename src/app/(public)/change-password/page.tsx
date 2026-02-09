@@ -17,7 +17,7 @@ export default function ChangePasswordPage() {
   const { updateTenant } = useData();
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -35,7 +35,7 @@ export default function ChangePasswordPage() {
 
     try {
       if (user) {
-        updateTenant(user.id, {
+        await updateTenant(user.id, {
           password: newPassword,
           mustChangePassword: false,
         });

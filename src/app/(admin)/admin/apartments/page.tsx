@@ -64,15 +64,15 @@ export default function ApartmentsPage() {
     return t ? `${t.firstName} ${t.lastName}` : "--";
   }
 
-  function handleAdd(data: Omit<Apartment, "id">) {
-    addApartment(data);
+  async function handleAdd(data: Omit<Apartment, "id">) {
+    await addApartment(data);
     setShowModal(false);
     showToast("Appartement cr\u00e9\u00e9 avec succ\u00e8s", "success");
   }
 
-  function handleEdit(data: Omit<Apartment, "id">) {
+  async function handleEdit(data: Omit<Apartment, "id">) {
     if (!editingApt) return;
-    updateApartment(editingApt.id, data);
+    await updateApartment(editingApt.id, data);
     setEditingApt(null);
     showToast("Appartement mis \u00e0 jour", "success");
   }

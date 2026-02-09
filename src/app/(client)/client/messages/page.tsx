@@ -116,11 +116,11 @@ export default function ClientMessagesPage() {
     [],
   );
 
-  const handleSendMessage = useCallback(() => {
+  const handleSendMessage = useCallback(async () => {
     const trimmed = messageText.trim();
     if (!trimmed || !selectedConvId || !tenantId) return;
 
-    addMessage({
+    await addMessage({
       conversationId: selectedConvId,
       senderId: tenantId,
       senderType: "client",
@@ -139,7 +139,7 @@ export default function ClientMessagesPage() {
     [handleSendMessage],
   );
 
-  const handleCreateConversation = useCallback(() => {
+  const handleCreateConversation = useCallback(async () => {
     const trimmedSubject = newSubject.trim();
     const trimmedMsg = newMessage.trim();
     if (!trimmedSubject || !trimmedMsg || !tenantId) return;
@@ -147,13 +147,13 @@ export default function ClientMessagesPage() {
     // Default admin assignment
     const adminId = admins.length > 0 ? admins[0].id : "ADM-0001";
 
-    const conv = addConversation({
+    const conv = await addConversation({
       tenantId,
       adminId,
       subject: trimmedSubject,
     });
 
-    addMessage({
+    await addMessage({
       conversationId: conv.id,
       senderId: tenantId,
       senderType: "client",

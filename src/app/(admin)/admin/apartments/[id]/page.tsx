@@ -90,15 +90,15 @@ export default function ApartmentDetailPage() {
     { value: "reserved", label: "R\u00e9serv\u00e9" },
   ];
 
-  function handleEditSubmit(data: Omit<Apartment, "id">) {
-    updateApartment(aptId, data);
+  async function handleEditSubmit(data: Omit<Apartment, "id">) {
+    await updateApartment(aptId, data);
     setShowEditModal(false);
     showToast("Appartement mis \u00e0 jour", "success");
   }
 
-  function handleStatusChange() {
+  async function handleStatusChange() {
     if (!newStatus) return;
-    updateApartment(aptId, { status: newStatus as Apartment["status"] });
+    await updateApartment(aptId, { status: newStatus as Apartment["status"] });
     setShowStatusModal(false);
     setNewStatus("");
     showToast("Statut mis \u00e0 jour", "success");

@@ -112,11 +112,11 @@ export default function AdminMessagesPage() {
     [],
   );
 
-  const handleSendMessage = useCallback(() => {
+  const handleSendMessage = useCallback(async () => {
     const trimmed = messageText.trim();
     if (!trimmed || !selectedConvId || !adminId) return;
 
-    addMessage({
+    await addMessage({
       conversationId: selectedConvId,
       senderId: adminId,
       senderType: "admin",

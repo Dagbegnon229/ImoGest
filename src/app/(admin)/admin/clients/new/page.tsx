@@ -105,14 +105,14 @@ export default function CreateClientPage() {
     return Object.keys(e).length === 0;
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
     setIsSubmitting(true);
 
     try {
       // 1. Create tenant
-      const newTenant = addTenant({
+      const newTenant = await addTenant({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim(),
@@ -127,7 +127,7 @@ export default function CreateClientPage() {
       });
 
       // 2. Create lease
-      const newLease = addLease({
+      const newLease = await addLease({
         tenantId: newTenant.id,
         apartmentId,
         buildingId,
@@ -140,7 +140,7 @@ export default function CreateClientPage() {
       });
 
       // 3. Update apartment
-      updateApartment(apartmentId, {
+      await updateApartment(apartmentId, {
         status: "occupied",
         tenantId: newTenant.id,
       });

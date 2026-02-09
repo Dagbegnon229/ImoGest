@@ -82,14 +82,14 @@ export default function NewIncidentPage() {
     return Object.keys(newErrors).length === 0;
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
 
     setIsSubmitting(true);
 
     try {
-      addIncident({
+      await addIncident({
         title: title.trim(),
         description: description.trim(),
         buildingId: tenant!.buildingId!,

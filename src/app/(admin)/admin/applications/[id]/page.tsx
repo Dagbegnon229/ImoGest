@@ -107,11 +107,11 @@ export default function ApplicationReviewPage() {
     return Object.keys(e).length === 0;
   }
 
-  function handleApprove() {
+  async function handleApprove() {
     if (!validateApprove()) return;
     setIsSubmitting(true);
     try {
-      approveApplication(appId, user?.id ?? "", buildingId, apartmentId, {
+      await approveApplication(appId, user?.id ?? "", buildingId, apartmentId, {
         startDate,
         endDate,
         monthlyRent: Number(rent),
@@ -126,14 +126,14 @@ export default function ApplicationReviewPage() {
     }
   }
 
-  function handleReject() {
+  async function handleReject() {
     if (!rejectNote.trim()) {
       setRejectError("Veuillez fournir une raison de rejet");
       return;
     }
     setIsSubmitting(true);
     try {
-      rejectApplication(appId, user?.id ?? "", rejectNote.trim());
+      await rejectApplication(appId, user?.id ?? "", rejectNote.trim());
       showToast("Demande rejet\u00e9e", "success");
       router.push("/admin/applications");
     } catch {

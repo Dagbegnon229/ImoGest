@@ -78,8 +78,8 @@ export default function BuildingDetailPage() {
     );
   }
 
-  function handleUpdate(data: Omit<Building, "id" | "createdAt">) {
-    updateBuilding(buildingId, data);
+  async function handleUpdate(data: Omit<Building, "id" | "createdAt">) {
+    await updateBuilding(buildingId, data);
     setShowEditModal(false);
     showToast("Immeuble mis \u00e0 jour", "success");
   }

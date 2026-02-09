@@ -75,24 +75,24 @@ export default function ClientDetailPage() {
     );
   }
 
-  function handleEditSubmit(data: {
+  async function handleEditSubmit(data: {
     firstName: string;
     lastName: string;
     email: string;
     phone: string;
   }) {
-    updateTenant(tenantId, data);
+    await updateTenant(tenantId, data);
     setShowEditModal(false);
     showToast("Informations mises \u00e0 jour", "success");
   }
 
-  function handleSuspend() {
-    updateTenant(tenantId, { status: "suspended" });
+  async function handleSuspend() {
+    await updateTenant(tenantId, { status: "suspended" });
     showToast("Client suspendu", "success");
   }
 
-  function handleReactivate() {
-    updateTenant(tenantId, { status: "active" });
+  async function handleReactivate() {
+    await updateTenant(tenantId, { status: "active" });
     showToast("Client r\u00e9activ\u00e9", "success");
   }
 

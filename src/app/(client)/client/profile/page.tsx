@@ -59,13 +59,13 @@ export default function ProfilePage() {
     return Object.keys(errors).length === 0;
   }
 
-  function handleSaveInfo(e: React.FormEvent) {
+  async function handleSaveInfo(e: React.FormEvent) {
     e.preventDefault();
     if (!validateInfo() || !tenant) return;
 
     setIsSavingInfo(true);
     try {
-      updateTenant(tenant.id, {
+      await updateTenant(tenant.id, {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim(),
@@ -109,13 +109,13 @@ export default function ProfilePage() {
     return Object.keys(errors).length === 0;
   }
 
-  function handleChangePassword(e: React.FormEvent) {
+  async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault();
     if (!validatePassword() || !tenant) return;
 
     setIsSavingPassword(true);
     try {
-      updateTenant(tenant.id, {
+      await updateTenant(tenant.id, {
         password: newPassword,
         mustChangePassword: false,
       });
