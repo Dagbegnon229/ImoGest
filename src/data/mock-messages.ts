@@ -1,0 +1,111 @@
+import type { Message, Conversation } from '@/types/message';
+
+export const mockConversations: Conversation[] = [
+  {
+    id: 'CONV-001',
+    tenantId: 'CLT-2026-0001',
+    adminId: 'ADM-0001',
+    subject: 'Demande de maintenance - Fuite robinet cuisine',
+    lastMessageAt: '2026-01-20T16:45:00Z',
+    unreadAdmin: 1,
+    unreadClient: 0,
+    createdAt: '2026-01-18T09:00:00Z',
+  },
+  {
+    id: 'CONV-002',
+    tenantId: 'CLT-2026-0002',
+    adminId: 'ADM-0010',
+    subject: 'Question sur le renouvellement du bail',
+    lastMessageAt: '2026-01-22T11:30:00Z',
+    unreadAdmin: 0,
+    unreadClient: 1,
+    createdAt: '2026-01-20T14:00:00Z',
+  },
+];
+
+export const mockMessages: Message[] = [
+  // === Conversation 1: Maintenance - CLT-2026-0001 avec ADM-0001 ===
+  {
+    id: 'MSG-001',
+    conversationId: 'CONV-001',
+    senderId: 'CLT-2026-0001',
+    senderType: 'client',
+    content: 'Bonjour, je souhaite signaler une fuite au niveau du robinet de la cuisine. L\'eau coule en permanence même lorsque le robinet est fermé. Pourriez-vous envoyer un technicien rapidement ?',
+    readAt: '2026-01-18T09:30:00Z',
+    createdAt: '2026-01-18T09:00:00Z',
+  },
+  {
+    id: 'MSG-002',
+    conversationId: 'CONV-001',
+    senderId: 'ADM-0001',
+    senderType: 'admin',
+    content: 'Bonjour M. Benali. Merci de nous avoir informés. Nous allons planifier l\'intervention d\'un plombier dans les 48 heures. Pouvez-vous nous confirmer vos disponibilités cette semaine ?',
+    readAt: '2026-01-18T14:00:00Z',
+    createdAt: '2026-01-18T10:15:00Z',
+  },
+  {
+    id: 'MSG-003',
+    conversationId: 'CONV-001',
+    senderId: 'CLT-2026-0001',
+    senderType: 'client',
+    content: 'Merci pour votre réactivité. Je suis disponible mercredi et jeudi matin entre 9h et 12h. En attendant, j\'ai placé un seau sous le robinet pour limiter les dégâts.',
+    readAt: '2026-01-19T08:00:00Z',
+    createdAt: '2026-01-18T14:30:00Z',
+  },
+  {
+    id: 'MSG-004',
+    conversationId: 'CONV-001',
+    senderId: 'ADM-0001',
+    senderType: 'admin',
+    content: 'Parfait. Le plombier passera mercredi 22 janvier à 10h. Il vous contactera 30 minutes avant son arrivée. N\'hésitez pas à nous prévenir si la situation s\'aggrave.',
+    readAt: '2026-01-20T09:00:00Z',
+    createdAt: '2026-01-19T09:00:00Z',
+  },
+  {
+    id: 'MSG-005',
+    conversationId: 'CONV-001',
+    senderId: 'CLT-2026-0001',
+    senderType: 'client',
+    content: 'C\'est noté, merci beaucoup. Je serai présent mercredi matin pour accueillir le plombier.',
+    readAt: null,
+    createdAt: '2026-01-20T16:45:00Z',
+  },
+
+  // === Conversation 2: Renouvellement bail - CLT-2026-0002 avec ADM-0010 ===
+  {
+    id: 'MSG-006',
+    conversationId: 'CONV-002',
+    senderId: 'CLT-2026-0002',
+    senderType: 'client',
+    content: 'Bonjour, mon bail arrive à échéance le 31 juillet 2026. Je souhaiterais savoir quelles sont les conditions pour le renouvellement et s\'il y aura une révision du loyer.',
+    readAt: '2026-01-20T15:00:00Z',
+    createdAt: '2026-01-20T14:00:00Z',
+  },
+  {
+    id: 'MSG-007',
+    conversationId: 'CONV-002',
+    senderId: 'ADM-0010',
+    senderType: 'admin',
+    content: 'Bonjour Mme Zahra. Merci pour votre anticipation. Le renouvellement est tout à fait possible. Nous vous enverrons une proposition de renouvellement avec les nouvelles conditions 3 mois avant l\'échéance, soit en avril 2026.',
+    readAt: '2026-01-21T08:00:00Z',
+    createdAt: '2026-01-20T16:30:00Z',
+  },
+  {
+    id: 'MSG-008',
+    conversationId: 'CONV-002',
+    senderId: 'CLT-2026-0002',
+    senderType: 'client',
+    content: 'D\'accord, merci pour ces précisions. Est-ce que le loyer risque d\'augmenter significativement ? Je voudrais pouvoir anticiper mon budget.',
+    readAt: '2026-01-21T14:00:00Z',
+    createdAt: '2026-01-21T10:00:00Z',
+  },
+  {
+    id: 'MSG-009',
+    conversationId: 'CONV-002',
+    senderId: 'ADM-0010',
+    senderType: 'admin',
+    content: 'La révision du loyer suit l\'indice de référence des loyers en vigueur. L\'ajustement sera raisonnable et conforme à la réglementation. Vous recevrez tous les détails dans la proposition formelle. En tant que locataire fidèle, vous bénéficierez de conditions avantageuses.',
+    readAt: null,
+    createdAt: '2026-01-22T11:30:00Z',
+  },
+];

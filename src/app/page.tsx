@@ -1,65 +1,126 @@
-import Image from "next/image";
+import Link from "next/link";
+import {
+  Building2,
+  MapPin,
+  ShieldAlert,
+  UserCheck,
+  ArrowRight,
+} from "lucide-react";
+import { PublicNavbar } from "@/components/layout/PublicNavbar";
+import { PublicFooter } from "@/components/layout/PublicFooter";
+
+const features = [
+  {
+    icon: Building2,
+    title: "Gestion de logements",
+    description:
+      "Gérez tous vos buildings et logements depuis une seule plateforme",
+  },
+  {
+    icon: MapPin,
+    title: "Localisation en temps réel",
+    description:
+      "Suivez vos techniciens et localisez vos biens immobiliers",
+  },
+  {
+    icon: ShieldAlert,
+    title: "Gestion des incidents",
+    description:
+      "Recevez et traitez les demandes de vos clients instantanément",
+  },
+  {
+    icon: UserCheck,
+    title: "Suivi client complet",
+    description:
+      "Accédez à toutes les informations de vos clients en un clic",
+  },
+];
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="min-h-screen flex flex-col">
+      {/* Navbar */}
+      <PublicNavbar />
+
+      {/* Hero Section */}
+      <section className="flex-1 flex flex-col items-center justify-center text-center px-4 py-24 bg-[#f8fafc]">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0f1b2d] max-w-4xl leading-tight">
+          Simplifiez la gestion de vos biens immobiliers
+        </h1>
+        <p className="mt-6 text-lg text-[#6b7280] max-w-2xl">
+          Une plateforme complète pour gérer vos buildings, logements, clients et
+          incidents en temps réel.
+        </p>
+        <div className="mt-10 flex flex-col sm:flex-row gap-4">
+          <Link
+            href="/connexion"
+            className="inline-flex items-center justify-center gap-2 bg-[#0f1b2d] text-white px-8 py-3.5 rounded-full text-base font-semibold hover:bg-[#1a2d4a] transition-colors"
+          >
+            Commencer
+            <ArrowRight className="h-5 w-5" />
+          </Link>
+          <a
+            href="#fonctionnalites"
+            className="inline-flex items-center justify-center gap-2 border-2 border-[#e5e7eb] text-[#0f1b2d] px-8 py-3.5 rounded-full text-base font-semibold hover:bg-gray-50 transition-colors"
+          >
+            En savoir plus
+          </a>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="fonctionnalites" className="py-24 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0f1b2d]">
+              Fonctionnalités principales
+            </h2>
+            <p className="mt-4 text-lg text-[#6b7280] max-w-2xl mx-auto">
+              Tous les outils dont vous avez besoin pour une gestion immobilière
+              efficace
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((feature) => (
+              <div
+                key={feature.title}
+                className="bg-white border border-[#e5e7eb] rounded-2xl p-8 hover:shadow-lg transition-shadow"
+              >
+                <div className="w-12 h-12 rounded-xl bg-[#d1fae5] flex items-center justify-center mb-5">
+                  <feature.icon className="h-6 w-6 text-[#10b981]" />
+                </div>
+                <h3 className="text-lg font-bold text-[#0f1b2d] mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-[#6b7280] text-sm leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="bg-[#0f1b2d] py-24 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
+            Prêt à transformer votre gestion immobilière ?
+          </h2>
+          <p className="mt-4 text-lg text-gray-300">
+            Rejoignez les professionnels qui font confiance à ImmoGest
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/register"
+            className="mt-10 inline-block bg-white text-[#0f1b2d] px-10 py-4 rounded-full text-base font-semibold hover:bg-gray-100 transition-colors"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            Commencer gratuitement
+          </Link>
         </div>
-      </main>
+      </section>
+
+      {/* Footer */}
+      <PublicFooter />
     </div>
   );
 }

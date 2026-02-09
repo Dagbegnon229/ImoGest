@@ -1,0 +1,40 @@
+import type { Admin } from '../types/admin';
+
+export const mockAdmins: Admin[] = [
+  {
+    id: 'ADM-0001',
+    firstName: 'Super',
+    lastName: 'Admin',
+    email: 'superadmin@immogest.ca',
+    phone: '514-000-0001',
+    role: 'super_admin',
+    password: 'Admin@2026!',
+    isActive: true,
+    createdAt: '2025-01-01T00:00:00Z',
+    createdBy: null,
+  },
+  {
+    id: 'ADM-0010',
+    firstName: 'Karim',
+    lastName: 'Benchekroun',
+    email: 'karim.benchekroun@immogest.ca',
+    phone: '514-000-0010',
+    role: 'admin_manager',
+    password: 'Manager@2026!',
+    isActive: true,
+    createdAt: '2025-03-15T10:30:00Z',
+    createdBy: 'ADM-0001',
+  },
+  {
+    id: 'ADM-0100',
+    firstName: 'Sara',
+    lastName: 'Alaoui',
+    email: 'sara.alaoui@immogest.ca',
+    phone: '514-000-0100',
+    role: 'admin_support',
+    password: 'Support@2026!',
+    isActive: true,
+    createdAt: '2025-06-01T08:00:00Z',
+    createdBy: 'ADM-0001',
+  },
+];
