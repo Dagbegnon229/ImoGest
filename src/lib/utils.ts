@@ -231,3 +231,35 @@ export function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
 }
+
+/**
+ * Returns a human-readable relative time string in French.
+ * Example: "il y a 3 jours", "il y a 2 mois", "il y a 1 an"
+ */
+export function getTimeAgo(dateString: string | null | undefined): string {
+  if (!dateString) return "";
+  try {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    if (diffMs < 0) return "à l'instant";
+
+    const minutes = Math.floor(diffMs / (1000 * 60));
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const months = Math.floor(days / 30);
+    const years = Math.floor(days / 365);
+
+    if (minutes < 1) return "à l'instant";
+    if (minutes < 60) return `il y a ${minutes} min`;
+    if (hours < 24) return `il y a ${hours}h`;
+    if (days === 1) return "il y a 1 jour";
+    if (days < 30) return `il y a ${days} jours`;
+    if (months === 1) return "il y a 1 mois";
+    if (months < 12) return `il y a ${months} mois`;
+    if (years === 1) return "il y a 1 an";
+    return `il y a ${years} ans`;
+  } catch {
+    return "";
+  }
+}

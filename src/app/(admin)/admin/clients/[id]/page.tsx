@@ -16,7 +16,10 @@ import {
   Pencil,
   Ban,
   CheckCircle2,
+  Trash2,
+  Clock,
 } from "lucide-react";
+import { getTimeAgo } from "@/lib/utils";
 import {
   tenantStatusLabels,
   tenantStatusColors,
@@ -39,11 +42,14 @@ export default function ClientDetailPage() {
     getLeaseByTenant,
     getIncidentsByTenant,
     updateTenant,
+    deleteTenant,
   } = useData();
 
   const tenantId = params.id as string;
   const tenant = getTenant(tenantId);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const building = tenant?.buildingId ? getBuilding(tenant.buildingId) : undefined;
   const apartment = tenant?.apartmentId ? getApartment(tenant.apartmentId) : undefined;
@@ -108,6 +114,20 @@ export default function ClientDetailPage() {
     }
   }
 
+  async function handleDelete() {
+    try {
+      setDeleting(true);
+      await deleteTenant(tenantId);
+      showToast("Client supprim\u00e9 avec succ\u00e8s", "success");
+      router.push("/admin/clients");
+    } catch {
+      showToast("Erreur lors de la suppression", "error");
+    } finally {
+      setDeleting(false);
+      setShowDeleteModal(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -127,6 +147,12 @@ export default function ClientDetailPage() {
             >
               {tenantStatusLabels[tenant.status] ?? tenant.status}
             </span>
+            {(tenant.statusChangedAt || tenant.createdAt) && (
+              <span className="inline-flex items-center gap-1 text-xs text-[#6b7280]">
+                <Clock className="h-3 w-3" />
+                {getTimeAgo(tenant.statusChangedAt || tenant.createdAt)}
+              </span>
+            )}
           </div>
           <p className="text-sm text-[#6b7280] font-mono">{tenant.id}</p>
         </div>
@@ -146,6 +172,14 @@ export default function ClientDetailPage() {
               R&eacute;activer
             </Button>
           ) : null}
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={() => setShowDeleteModal(true)}
+          >
+            <Trash2 className="h-4 w-4" />
+            Supprimer
+          </Button>
         </div>
       </div>
 
@@ -370,6 +404,50 @@ export default function ClientDetailPage() {
           onSubmit={handleEditSubmit}
           onClose={() => setShowEditModal(false)}
         />
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="Confirmer la suppression"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 p-3 bg-red-50 rounded-lg border border-red-200">
+            <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0" />
+            <p className="text-sm text-red-700">
+              Cette action est irr&eacute;versible. Toutes les donn&eacute;es li&eacute;es &agrave; ce client seront
+              &eacute;galement supprim&eacute;es (bail, paiements, incidents, documents...).
+            </p>
+          </div>
+          <p className="text-sm text-[#6b7280]">
+            &Ecirc;tes-vous s&ucirc;r de vouloir supprimer le client{" "}
+            <span className="font-semibold text-[#171717]">
+              {tenant.firstName} {tenant.lastName}
+            </span>{" "}
+            ({tenant.id}) ?
+          </p>
+          <div className="flex justify-end gap-3 pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowDeleteModal(false)}
+              disabled={deleting}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={handleDelete}
+              disabled={deleting}
+            >
+              <Trash2 className="h-4 w-4" />
+              {deleting ? "Suppression..." : "Supprimer d\u00e9finitivement"}
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

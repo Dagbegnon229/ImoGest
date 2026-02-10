@@ -15,6 +15,7 @@ export const mockTenants: Tenant[] = [
     mustChangePassword: false,
     createdAt: '2025-06-01T10:00:00Z',
     createdBy: 'ADM-0010',
+    statusChangedAt: '2025-06-01T10:00:00Z',
   },
   {
     id: 'CLT-2026-0002',
@@ -30,6 +31,7 @@ export const mockTenants: Tenant[] = [
     mustChangePassword: false,
     createdAt: '2025-07-15T14:00:00Z',
     createdBy: 'ADM-0010',
+    statusChangedAt: '2025-07-15T14:00:00Z',
   },
   {
     id: 'CLT-2026-0003',
@@ -45,6 +47,7 @@ export const mockTenants: Tenant[] = [
     mustChangePassword: false,
     createdAt: '2025-08-01T09:30:00Z',
     createdBy: 'ADM-0100',
+    statusChangedAt: '2025-08-01T09:30:00Z',
   },
   {
     id: 'CLT-2026-0004',
@@ -60,6 +63,7 @@ export const mockTenants: Tenant[] = [
     mustChangePassword: false,
     createdAt: '2025-09-01T11:00:00Z',
     createdBy: 'ADM-0100',
+    statusChangedAt: '2025-09-01T11:00:00Z',
   },
   {
     id: 'CLT-2026-0005',
@@ -75,6 +79,7 @@ export const mockTenants: Tenant[] = [
     mustChangePassword: false,
     createdAt: '2025-10-01T08:00:00Z',
     createdBy: 'ADM-0010',
+    statusChangedAt: '2025-10-01T08:00:00Z',
   },
   {
     id: 'CLT-2026-0006',
@@ -90,5 +95,6 @@ export const mockTenants: Tenant[] = [
     mustChangePassword: false,
     createdAt: '2025-05-01T16:00:00Z',
     createdBy: 'ADM-0010',
+    statusChangedAt: '2025-11-01T12:00:00Z',
   },
 ];

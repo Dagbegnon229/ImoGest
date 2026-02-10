@@ -93,6 +93,7 @@ function mapTenantRow(row: Record<string, unknown>): Tenant {
     mustChangePassword: row.must_change_password as boolean,
     createdAt: row.created_at as string,
     createdBy: (row.created_by as string) ?? null,
+    statusChangedAt: (row.status_changed_at as string) ?? null,
   };
 }
 

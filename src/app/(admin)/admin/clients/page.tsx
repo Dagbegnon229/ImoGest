@@ -9,6 +9,7 @@ import {
   tenantStatusLabels,
   tenantStatusColors,
 } from "@/lib/constants";
+import { getTimeAgo } from "@/lib/utils";
 
 export default function ClientsPage() {
   const { tenants, buildings, apartments, applications } = useData();
@@ -158,13 +159,20 @@ export default function ClientsPage() {
                       {getAptUnit(tenant.apartmentId)}
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                          tenantStatusColors[tenant.status] ?? ""
-                        }`}
-                      >
-                        {tenantStatusLabels[tenant.status] ?? tenant.status}
-                      </span>
+                      <div className="flex flex-col gap-0.5">
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium w-fit ${
+                            tenantStatusColors[tenant.status] ?? ""
+                          }`}
+                        >
+                          {tenantStatusLabels[tenant.status] ?? tenant.status}
+                        </span>
+                        {(tenant.statusChangedAt || tenant.createdAt) && (
+                          <span className="text-[10px] text-[#9ca3af]">
+                            {getTimeAgo(tenant.statusChangedAt || tenant.createdAt)}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Link

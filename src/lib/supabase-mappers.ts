@@ -137,6 +137,7 @@ export function toTenant(row: any): Tenant {
     mustChangePassword: row.must_change_password,
     createdAt: row.created_at,
     createdBy: row.created_by,
+    statusChangedAt: row.status_changed_at,
   };
 }
 
@@ -155,6 +156,7 @@ export function fromTenant(tenant: Tenant): any {
     must_change_password: tenant.mustChangePassword,
     created_at: tenant.createdAt,
     created_by: tenant.createdBy,
+    status_changed_at: tenant.statusChangedAt,
   };
 }
 

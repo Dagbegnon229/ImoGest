@@ -124,6 +124,7 @@ export default function CreateClientPage() {
         leaseId: null,
         mustChangePassword: forceChange,
         createdBy: user?.id ?? null,
+        statusChangedAt: null,
       });
 
       // 2. Create lease

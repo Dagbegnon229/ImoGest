@@ -73,6 +73,7 @@ interface DataContextType {
   getTenant: (id: string) => Tenant | undefined;
   addTenant: (data: Omit<Tenant, 'id' | 'createdAt'>) => Promise<Tenant>;
   updateTenant: (id: string, data: Partial<Tenant>) => Promise<void>;
+  deleteTenant: (id: string) => Promise<void>;
 
   // Admins
   getAdmin: (id: string) => Admin | undefined;
@@ -218,6 +219,7 @@ async function fetchTenants(): Promise<Tenant[]> {
     mustChangePassword: row.must_change_password,
     createdAt: row.created_at,
     createdBy: row.created_by,
+    statusChangedAt: row.status_changed_at,
   } as Tenant));
 }
 
@@ -635,6 +637,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           lease_id: data.leaseId,
           must_change_password: data.mustChangePassword,
           created_by: data.createdBy,
+          status_changed_at: new Date().toISOString(),
         })
         .select()
         .single();
@@ -653,6 +656,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         mustChangePassword: row.must_change_password,
         createdAt: row.created_at,
         createdBy: row.created_by,
+        statusChangedAt: row.status_changed_at,
       };
       setTenants((prev) => [...prev, newTenant]);
       return newTenant;
@@ -668,7 +672,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (data.email !== undefined) updatePayload.email = data.email;
       if (data.phone !== undefined) updatePayload.phone = data.phone;
       if (data.password !== undefined) updatePayload.password = data.password;
-      if (data.status !== undefined) updatePayload.status = data.status;
+      if (data.status !== undefined) {
+        updatePayload.status = data.status;
+        updatePayload.status_changed_at = new Date().toISOString();
+      }
       if (data.buildingId !== undefined) updatePayload.building_id = data.buildingId;
       if (data.apartmentId !== undefined) updatePayload.apartment_id = data.apartmentId;
       if (data.leaseId !== undefined) updatePayload.lease_id = data.leaseId;
@@ -678,11 +685,59 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const { error } = await supabase.from('tenants').update(updatePayload).eq('id', id);
       if (error) throw error;
       setTenants((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, ...data, id: t.id } : t)),
+        prev.map((t) => {
+          if (t.id !== id) return t;
+          const updated = { ...t, ...data, id: t.id };
+          if (data.status !== undefined) {
+            updated.statusChangedAt = new Date().toISOString();
+          }
+          return updated;
+        }),
       );
     },
     [],
   );
+
+  const deleteTenant = useCallback(async (id: string): Promise<void> => {
+    // Delete related records first (cascade)
+    // 1. Find conversations for this tenant, then delete their messages
+    const { data: convos } = await supabase.from('conversations').select('id').eq('tenant_id', id);
+    if (convos && convos.length > 0) {
+      for (const c of convos) {
+        await supabase.from('messages').delete().eq('conversation_id', c.id);
+      }
+    }
+    await supabase.from('conversations').delete().eq('tenant_id', id);
+    await supabase.from('documents').delete().eq('tenant_id', id);
+    await supabase.from('points_transactions').delete().eq('tenant_id', id);
+    await supabase.from('loyalty_profiles').delete().eq('tenant_id', id);
+    await supabase.from('payments').delete().eq('tenant_id', id);
+    await supabase.from('incidents').delete().eq('reported_by', id);
+    await supabase.from('leases').delete().eq('tenant_id', id);
+    // Free up the apartment if assigned
+    await supabase.from('apartments').update({ status: 'available', tenant_id: null }).eq('tenant_id', id);
+    // Delete the tenant
+    const { error } = await supabase.from('tenants').delete().eq('id', id);
+    if (error) throw error;
+    // Clean up local state
+    setTenants((prev) => prev.filter((t) => t.id !== id));
+    setLeases((prev) => prev.filter((l) => l.tenantId !== id));
+    setIncidents((prev) => prev.filter((i) => i.reportedBy !== id));
+    setPayments((prev) => prev.filter((p) => p.tenantId !== id));
+    setDocuments((prev) => prev.filter((d) => d.tenantId !== id));
+    setApartments((prev) =>
+      prev.map((a) =>
+        a.tenantId === id ? { ...a, status: 'available', tenantId: null } : a
+      ),
+    );
+    setConversations((prev) => prev.filter((c) => c.tenantId !== id));
+    setMessages((prev) => {
+      const removedConvoIds = new Set(
+        conversations.filter((c) => c.tenantId === id).map((c) => c.id)
+      );
+      return prev.filter((m) => !removedConvoIds.has(m.conversationId));
+    });
+  }, [conversations]);
 
   // =======================================================================
   // ADMINS
@@ -1018,6 +1073,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           lease_id: leaseId,
           must_change_password: true,
           created_by: adminId,
+          status_changed_at: timestamp,
         })
         .select()
         .single();
@@ -1072,6 +1128,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         mustChangePassword: tenantRow.must_change_password,
         createdAt: tenantRow.created_at,
         createdBy: tenantRow.created_by,
+        statusChangedAt: tenantRow.status_changed_at,
       };
 
       const newLease: Lease = {
@@ -1610,6 +1667,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     getTenant,
     addTenant,
     updateTenant,
+    deleteTenant,
 
     // Admins
     getAdmin,

@@ -14,4 +14,5 @@ export interface Tenant {
   mustChangePassword: boolean;
   createdAt: string;
   createdBy: string | null;
+  statusChangedAt: string | null;
 }
