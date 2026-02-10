@@ -17,18 +17,16 @@ const footerLinks = {
   produit: {
     title: "Produit",
     links: [
-      { label: "Fonctionnalit\u00e9s", href: "#fonctionnalites" },
-      { label: "Tarifs", href: "#tarifs" },
-      { label: "D\u00e9mo", href: "#demo" },
-      { label: "Int\u00e9grations", href: "#" },
+      { label: "Fonctionnalités", href: "#fonctionnalites" },
+      { label: "Intégrations", href: "#" },
       { label: "Changelog", href: "#" },
     ],
   },
   entreprise: {
     title: "Entreprise",
     links: [
-      { label: "\u00c0 propos", href: "#" },
-      { label: "Carri\u00e8res", href: "#" },
+      { label: "À propos", href: "#" },
+      { label: "Carrières", href: "#" },
       { label: "Blog", href: "#" },
       { label: "Presse", href: "#" },
       { label: "Contact", href: "#" },
@@ -40,16 +38,16 @@ const footerLinks = {
       { label: "Centre d'aide", href: "#" },
       { label: "Documentation", href: "#" },
       { label: "Statut du service", href: "#" },
-      { label: "Communaut\u00e9", href: "#" },
+      { label: "Communauté", href: "#" },
       { label: "Webinaires", href: "#" },
     ],
   },
   legal: {
-    title: "L\u00e9gal",
+    title: "Légal",
     links: [
       { label: "Conditions d'utilisation", href: "#" },
-      { label: "Politique de confidentialit\u00e9", href: "#" },
-      { label: "Mentions l\u00e9gales", href: "#" },
+      { label: "Politique de confidentialité", href: "#" },
+      { label: "Mentions légales", href: "#" },
       { label: "Cookies", href: "#" },
       { label: "RGPD", href: "#" },
     ],

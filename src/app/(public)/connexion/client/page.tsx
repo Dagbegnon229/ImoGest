@@ -179,15 +179,6 @@ export default function ClientLogin() {
               </Link>
             </p>
 
-            {/* Back link */}
-            <p className="mt-3 text-center text-sm text-[#6b7280]">
-              <Link
-                href="/connexion"
-                className="text-[#0f1b2d] font-medium hover:underline"
-              >
-                &larr; Retour au choix du portail
-              </Link>
-            </p>
           </div>
         </div>
       </div>

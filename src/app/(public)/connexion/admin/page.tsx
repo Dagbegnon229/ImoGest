@@ -171,10 +171,10 @@ export default function AdminLogin() {
             {/* Back link */}
             <p className="mt-4 text-center text-sm text-[#6b7280]">
               <Link
-                href="/connexion"
+                href="/"
                 className="text-[#0f1b2d] font-medium hover:underline"
               >
-                &larr; Retour au choix du portail
+                &larr; Retour à l&apos;accueil
               </Link>
             </p>
           </div>

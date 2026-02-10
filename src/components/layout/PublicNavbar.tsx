@@ -5,10 +5,8 @@ import { useState, useEffect } from "react";
 import { Building2, Menu, X } from "lucide-react";
 
 const navLinks = [
-  { label: "Fonctionnalit\u00e9s", href: "#fonctionnalites" },
-  { label: "Comment \u00e7a marche", href: "#comment-ca-marche" },
-  { label: "D\u00e9mo", href: "#demo" },
-  { label: "Tarifs", href: "#tarifs" },
+  { label: "Fonctionnalités", href: "#fonctionnalites" },
+  { label: "Comment ça marche", href: "#comment-ca-marche" },
 ];
 
 export function PublicNavbar() {
@@ -72,7 +70,7 @@ export function PublicNavbar() {
         {/* Desktop CTAs */}
         <div className="hidden md:flex items-center gap-3">
           <Link
-            href="/connexion"
+            href="/connexion/client"
             className="text-sm font-medium text-[#6b7280] hover:text-[#0f1b2d] transition-colors px-4 py-2"
           >
             Connexion
@@ -117,7 +115,7 @@ export function PublicNavbar() {
           ))}
           <div className="pt-4 border-t border-[#e5e7eb] space-y-2">
             <Link
-              href="/connexion"
+              href="/connexion/client"
               className="block w-full text-center px-4 py-3 text-sm font-medium text-[#6b7280] hover:text-[#0f1b2d] border border-[#e5e7eb] rounded-full transition-colors"
             >
               Connexion

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   Building2,
   Users,
@@ -16,16 +16,7 @@ import {
   Zap,
   Shield,
   BarChart3,
-  Clock,
-  Headphones,
   Monitor,
-  Smartphone,
-  AlertCircle,
-  X,
-  Send,
-  Twitter,
-  Linkedin,
-  Github,
 } from "lucide-react";
 import { PublicNavbar } from "@/components/layout/PublicNavbar";
 import { PublicFooter } from "@/components/layout/PublicFooter";
@@ -120,76 +111,76 @@ const features = [
     icon: Building2,
     title: "Gestion des immeubles",
     description:
-      "Centralisez tous vos biens, appartements, et donn\u00e9es en un seul endroit. Vue d'ensemble compl\u00e8te de votre patrimoine.",
+      "Centralisez tous vos biens, appartements, et données en un seul endroit. Vue d'ensemble complète de votre patrimoine.",
     details: [
-      "Gestion multi-immeubles avec \u00e9tages et lots",
+      "Gestion multi-immeubles avec étages et lots",
       "Suivi des surfaces, loyers et historique",
       "Documents et photos par bien",
       "Tableau de bord par immeuble",
-      "Export des donn\u00e9es et rapports",
+      "Export des données et rapports",
     ],
   },
   {
     icon: Users,
     title: "Portail locataire",
     description:
-      "Espace d\u00e9di\u00e9 pour chaque locataire avec son bail, paiements et documents accessibles \u00e0 tout moment.",
+      "Espace dédié pour chaque locataire avec son bail, paiements et documents accessibles à tout moment.",
     details: [
       "Dashboard personnel pour chaque locataire",
-      "Bail en ligne avec signature \u00e9lectronique",
+      "Bail en ligne avec signature électronique",
       "Historique complet des paiements",
-      "Documents t\u00e9l\u00e9chargeables (quittances, bail)",
-      "Notifications et rappels personnalis\u00e9s",
+      "Documents téléchargeables (quittances, bail)",
+      "Notifications et rappels personnalisés",
     ],
   },
   {
     icon: Wrench,
     title: "Gestion des incidents",
     description:
-      "Signalement, suivi, assignation et r\u00e9solution en temps r\u00e9el. Ne perdez plus jamais un ticket.",
+      "Signalement, suivi, assignation et résolution en temps réel. Ne perdez plus jamais un ticket.",
     details: [
-      "Photos et description d\u00e9taill\u00e9e",
-      "Niveaux de priorit\u00e9 (urgent, normal, faible)",
+      "Photos et description détaillée",
+      "Niveaux de priorité (urgent, normal, faible)",
       "Assignation automatique aux techniciens",
-      "Suivi du statut en temps r\u00e9el",
-      "Notifications \u00e0 chaque \u00e9tape",
+      "Suivi du statut en temps réel",
+      "Notifications à chaque étape",
     ],
   },
   {
     icon: CreditCard,
     title: "Paiements & Facturation",
     description:
-      "Suivi des loyers, quittances automatiques et rappels de retard. Tout est automatis\u00e9.",
+      "Suivi des loyers, quittances automatiques et rappels de retard. Tout est automatisé.",
     details: [
-      "Virement, carte, esp\u00e8ces, ch\u00e8que",
-      "G\u00e9n\u00e9ration automatique de quittances PDF",
+      "Virement, carte, espèces, chèque",
+      "Génération automatique de quittances PDF",
       "Alertes de retard de paiement",
-      "P\u00e9nalit\u00e9s automatiques configurable",
-      "Rapports financiers d\u00e9taill\u00e9s",
+      "Pénalités automatiques configurable",
+      "Rapports financiers détaillés",
     ],
   },
   {
     icon: Trophy,
-    title: "Programme de fid\u00e9lit\u00e9",
+    title: "Programme de fidélité",
     description:
-      "Points, niveaux et r\u00e9compenses pour les bons locataires. Encouragez les paiements \u00e0 temps.",
+      "Points, niveaux et récompenses pour les bons locataires. Encouragez les paiements à temps.",
     details: [
       "5 niveaux : Bronze, Silver, Gold, Platinum, Diamond",
-      "Points gagn\u00e9s par paiement ponctuel",
-      "R\u00e9ductions sur le loyer pour les fid\u00e8les",
-      "Badges et r\u00e9compenses exclusives",
+      "Points gagnés par paiement ponctuel",
+      "Réductions sur le loyer pour les fidèles",
+      "Badges et récompenses exclusives",
       "Classement et gamification",
     ],
   },
   {
     icon: MessageSquare,
-    title: "Messagerie int\u00e9gr\u00e9e",
+    title: "Messagerie intégrée",
     description:
       "Communication directe admin-locataire sans quitter la plateforme. Historique complet.",
     details: [
-      "Chat en temps r\u00e9el",
+      "Chat en temps réel",
       "Historique des conversations",
-      "Pi\u00e8ces jointes et documents",
+      "Pièces jointes et documents",
       "Notifications push et email",
       "Fils de discussion par sujet",
     ],
@@ -200,7 +191,7 @@ const features = [
 
 const trustLogos = [
   { name: "Atlas Immobilier", icon: Building2 },
-  { name: "R\u00e9sidences Royales", icon: Shield },
+  { name: "Résidences Royales", icon: Shield },
   { name: "Groupe Al Omrane", icon: BarChart3 },
   { name: "Casablanca Properties", icon: Zap },
   { name: "Marrakech Estates", icon: Star },
@@ -214,21 +205,21 @@ const steps = [
     num: "01",
     title: "Inscrivez votre immeuble",
     description:
-      "Ajoutez vos biens et configurez les appartements, \u00e9tages et lots en quelques clics.",
+      "Ajoutez vos biens et configurez les appartements, étages et lots en quelques clics.",
     icon: Building2,
   },
   {
     num: "02",
     title: "Invitez vos locataires",
     description:
-      "Chaque locataire re\u00e7oit son identifiant CLT unique et acc\u00e8de \u00e0 son espace personnel.",
+      "Chaque locataire reçoit son identifiant CLT unique et accède à son espace personnel.",
     icon: Users,
   },
   {
     num: "03",
-    title: "G\u00e9rez tout en un clic",
+    title: "Gérez tout en un clic",
     description:
-      "Incidents, paiements, communications\u2026 tout est centralis\u00e9 dans un tableau de bord intuitif.",
+      "Incidents, paiements, communications… tout est centralisé dans un tableau de bord intuitif.",
     icon: Monitor,
   },
 ];
@@ -238,78 +229,24 @@ const steps = [
 const testimonials = [
   {
     quote:
-      "ImmoGest a compl\u00e8tement transform\u00e9 notre gestion quotidienne. Nous avons r\u00e9duit les retards de paiement de 60% en 3 mois.",
+      "ImmoGest a complètement transformé notre gestion quotidienne. Nous avons réduit les retards de paiement de 60% en 3 mois.",
     name: "Karim Benali",
-    title: "Directeur G\u00e9n\u00e9ral",
+    title: "Directeur Général",
     company: "Atlas Immobilier",
   },
   {
     quote:
-      "Le portail locataire est une r\u00e9volution. Nos clients sont plus satisfaits et nous gagnons un temps pr\u00e9cieux chaque jour.",
+      "Le portail locataire est une révolution. Nos clients sont plus satisfaits et nous gagnons un temps précieux chaque jour.",
     name: "Fatima Zahra El Alaoui",
     title: "Responsable Patrimoine",
-    company: "R\u00e9sidences Royales",
+    company: "Résidences Royales",
   },
   {
     quote:
-      "La gestion des incidents en temps r\u00e9el nous a permis de r\u00e9duire notre temps de r\u00e9solution de 48h \u00e0 moins de 6h.",
+      "La gestion des incidents en temps réel nous a permis de réduire notre temps de résolution de 48h à moins de 6h.",
     name: "Youssef Amrani",
     title: "Chef de Projet",
     company: "Groupe Al Omrane",
-  },
-];
-
-/* ───────────────────── Pricing Data ───────────────────── */
-
-const pricingPlans = [
-  {
-    name: "Starter",
-    price: "Gratuit",
-    period: "",
-    description: "Pour d\u00e9marrer avec un petit portefeuille",
-    features: [
-      "Jusqu'\u00e0 2 immeubles",
-      "10 locataires maximum",
-      "Gestion des incidents",
-      "Messagerie basique",
-      "Support par email",
-    ],
-    cta: "Commencer gratuitement",
-    popular: false,
-  },
-  {
-    name: "Pro",
-    price: "499",
-    period: "MAD/mois",
-    description: "Pour les gestionnaires professionnels",
-    features: [
-      "Immeubles illimit\u00e9s",
-      "Locataires illimit\u00e9s",
-      "Paiements & facturation",
-      "Programme de fid\u00e9lit\u00e9",
-      "Messagerie avanc\u00e9e",
-      "Quittances PDF automatiques",
-      "Support prioritaire 24/7",
-    ],
-    cta: "Essai gratuit 14 jours",
-    popular: true,
-  },
-  {
-    name: "Enterprise",
-    price: "Sur devis",
-    period: "",
-    description: "Pour les grands groupes immobiliers",
-    features: [
-      "Tout du plan Pro",
-      "API d\u00e9di\u00e9e",
-      "Int\u00e9grations personnalis\u00e9es",
-      "Formation sur site",
-      "Account manager d\u00e9di\u00e9",
-      "SLA garanti 99.99%",
-      "D\u00e9ploiement on-premise",
-    ],
-    cta: "Contactez-nous",
-    popular: false,
   },
 ];
 
@@ -319,7 +256,6 @@ const pricingPlans = [
 
 export default function Home() {
   const [expandedFeature, setExpandedFeature] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState(0);
 
   const heroStats = useScrollAnimation(0.2);
   const heroCount1 = useCounter(500, heroStats.isVisible);
@@ -418,13 +354,6 @@ export default function Home() {
               Commencer gratuitement
               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
-            <a
-              href="#demo"
-              className="inline-flex items-center justify-center gap-2 bg-white border-2 border-[#e5e7eb] text-[#0f1b2d] px-8 py-4 rounded-full text-base font-semibold hover:border-[#10b981] hover:text-[#10b981] transition-all duration-300"
-            >
-              <Monitor className="h-5 w-5" />
-              Voir la d&eacute;mo
-            </a>
           </div>
         </div>
 
@@ -435,9 +364,9 @@ export default function Home() {
           style={{ animation: "fade-in-up 0.8s ease-out 0.6s both" }}
         >
           {[
-            { value: heroCount1, suffix: "+", label: "Immeubles g\u00e9r\u00e9s" },
+            { value: heroCount1, suffix: "+", label: "Immeubles gérés" },
             { value: heroCount2, suffix: "+", label: "Locataires actifs" },
-            { value: "99.9", suffix: "%", label: "Disponibilit\u00e9", isStatic: true },
+            { value: "99.9", suffix: "%", label: "Disponibilité", isStatic: true },
           ].map((item, i) => (
             <div key={i} className="text-center">
               <div className="text-3xl sm:text-4xl font-extrabold text-[#0f1b2d]">
@@ -485,7 +414,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <SectionHeader
             title="Tout ce dont vous avez besoin"
-            subtitle="Des outils puissants pour g\u00e9rer chaque aspect de votre patrimoine immobilier, du premier jour."
+            subtitle="Des outils puissants pour gérer chaque aspect de votre patrimoine immobilier, du premier jour."
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
@@ -512,8 +441,8 @@ export default function Home() {
       <section id="comment-ca-marche" className="py-24 px-4 bg-white">
         <div className="max-w-5xl mx-auto">
           <SectionHeader
-            title="Comment \u00e7a marche"
-            subtitle="Trois \u00e9tapes simples pour transformer votre gestion immobili\u00e8re."
+            title="Comment ça marche"
+            subtitle="Trois étapes simples pour transformer votre gestion immobilière."
           />
 
           <div className="mt-16 relative">
@@ -524,58 +453,6 @@ export default function Home() {
               {steps.map((step, index) => (
                 <StepCard key={index} step={step} index={index} />
               ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================================
-          5. INTERACTIVE DEMO
-          ============================================================ */}
-      <section id="demo" className="py-24 px-4 bg-[#f8fafc]">
-        <div className="max-w-6xl mx-auto">
-          <SectionHeader
-            title="D\u00e9couvrez l'interface"
-            subtitle="Une interface intuitive con\u00e7ue pour simplifier votre quotidien."
-          />
-
-          <div className="mt-12">
-            {/* Tab switcher */}
-            <div className="flex justify-center mb-8">
-              <div className="inline-flex bg-white rounded-full p-1.5 border border-[#e5e7eb] shadow-sm">
-                {["Dashboard Admin", "Espace Client", "Gestion Incidents"].map(
-                  (tab, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setActiveTab(i)}
-                      className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                        activeTab === i
-                          ? "bg-[#0f1b2d] text-white shadow-md"
-                          : "text-[#6b7280] hover:text-[#0f1b2d]"
-                      }`}
-                    >
-                      {tab}
-                    </button>
-                  )
-                )}
-              </div>
-            </div>
-
-            {/* Tab content mockup */}
-            <div className="bg-white rounded-2xl border border-[#e5e7eb] shadow-xl overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 bg-[#f8fafc] border-b border-[#e5e7eb]">
-                <div className="w-3 h-3 rounded-full bg-red-400" />
-                <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                <div className="w-3 h-3 rounded-full bg-green-400" />
-                <span className="ml-4 text-xs text-[#6b7280]">
-                  immogest.ma/dashboard
-                </span>
-              </div>
-              <div className="p-8 min-h-[400px] transition-all duration-500">
-                {activeTab === 0 && <AdminDashboardMock />}
-                {activeTab === 1 && <ClientDashboardMock />}
-                {activeTab === 2 && <IncidentDashboardMock />}
-              </div>
             </div>
           </div>
         </div>
@@ -642,25 +519,7 @@ export default function Home() {
       </section>
 
       {/* ============================================================
-          8. PRICING
-          ============================================================ */}
-      <section id="tarifs" className="py-24 px-4 bg-[#f8fafc]">
-        <div className="max-w-7xl mx-auto">
-          <SectionHeader
-            title="Tarification simple et transparente"
-            subtitle="Pas de frais cach\u00e9s. Choisissez le plan qui correspond \u00e0 vos besoins."
-          />
-
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-            {pricingPlans.map((plan, i) => (
-              <PricingCard key={i} plan={plan} index={i} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================================
-          9. FINAL CTA
+          8. FINAL CTA
           ============================================================ */}
       <section className="py-24 px-4 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)" }}>
         <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
@@ -770,7 +629,7 @@ function FeatureCard({
       </div>
 
       <button className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#10b981] hover:text-[#059669] transition-colors">
-        {isExpanded ? "Moins de d\u00e9tails" : "En savoir plus"}
+        {isExpanded ? "Moins de détails" : "En savoir plus"}
         <ChevronDown
           className={`h-4 w-4 transition-transform duration-300 ${
             isExpanded ? "rotate-180" : ""
@@ -808,7 +667,7 @@ function StepCard({
           <Icon className="h-7 w-7 text-white" />
         </div>
         <div className="text-xs font-bold text-[#10b981] uppercase tracking-widest mb-2">
-          \u00c9tape {step.num}
+          Étape {step.num}
         </div>
         <h3 className="text-xl font-bold text-[#0f1b2d] mb-3">{step.title}</h3>
         <p className="text-[#6b7280] text-sm leading-relaxed">
@@ -868,100 +727,6 @@ function TestimonialCard({
   );
 }
 
-/* ──── Pricing Card ──── */
-
-function PricingCard({
-  plan,
-  index,
-}: {
-  plan: (typeof pricingPlans)[0];
-  index: number;
-}) {
-  const { ref, isVisible } = useScrollAnimation();
-
-  return (
-    <div
-      ref={ref}
-      className={`rounded-2xl p-8 border transition-all duration-300 hover:shadow-xl ${
-        plan.popular
-          ? "bg-[#0f1b2d] border-[#10b981] text-white relative scale-105 shadow-xl"
-          : "bg-white border-[#e5e7eb] hover:border-[#10b981]/30"
-      }`}
-      style={{
-        opacity: isVisible ? 1 : 0,
-        transform: isVisible
-          ? plan.popular
-            ? "translateY(0) scale(1.05)"
-            : "translateY(0)"
-          : "translateY(30px)",
-        transition: `all 0.6s ease-out ${index * 0.15}s`,
-      }}
-    >
-      {plan.popular && (
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#10b981] text-white text-xs font-bold px-4 py-1 rounded-full">
-          Populaire
-        </div>
-      )}
-      <h3
-        className={`text-xl font-bold mb-2 ${
-          plan.popular ? "text-white" : "text-[#0f1b2d]"
-        }`}
-      >
-        {plan.name}
-      </h3>
-      <p
-        className={`text-sm mb-6 ${
-          plan.popular ? "text-gray-300" : "text-[#6b7280]"
-        }`}
-      >
-        {plan.description}
-      </p>
-      <div className="mb-6">
-        <span
-          className={`text-4xl font-extrabold ${
-            plan.popular ? "text-white" : "text-[#0f1b2d]"
-          }`}
-        >
-          {plan.price}
-        </span>
-        {plan.period && (
-          <span
-            className={`text-sm ml-1 ${
-              plan.popular ? "text-gray-400" : "text-[#6b7280]"
-            }`}
-          >
-            {plan.period}
-          </span>
-        )}
-      </div>
-      <ul className="space-y-3 mb-8">
-        {plan.features.map((f, i) => (
-          <li key={i} className="flex items-center gap-2 text-sm">
-            <Check
-              className={`h-4 w-4 shrink-0 ${
-                plan.popular ? "text-[#10b981]" : "text-[#10b981]"
-              }`}
-            />
-            <span className={plan.popular ? "text-gray-200" : "text-[#6b7280]"}>
-              {f}
-            </span>
-          </li>
-        ))}
-      </ul>
-      <Link
-        href="/register"
-        className={`block w-full text-center py-3 rounded-full font-semibold text-sm transition-all duration-300 ${
-          plan.popular
-            ? "bg-[#10b981] text-white hover:bg-[#059669]"
-            : "bg-[#0f1b2d] text-white hover:bg-[#1a2d4a]"
-        }`}
-      >
-        {plan.cta}
-      </Link>
-    </div>
-  );
-}
-
 /* ──── Final CTA ──── */
 
 function FinalCTA() {
@@ -994,7 +759,7 @@ function FinalCTA() {
           <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
         </Link>
         <Link
-          href="/connexion"
+          href="/connexion/client"
           className="inline-flex items-center justify-center gap-2 border-2 border-white/30 text-white px-8 py-4 rounded-full text-base font-semibold hover:bg-white/10 transition-all duration-300"
         >
           Se connecter
@@ -1004,195 +769,3 @@ function FinalCTA() {
   );
 }
 
-/* ──── Dashboard Mockups ──── */
-
-function AdminDashboardMock() {
-  return (
-    <div style={{ animation: "fade-in-up 0.5s ease-out" }}>
-      {/* Stats row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {[
-          { label: "Immeubles", value: "12", change: "+2", icon: Building2 },
-          { label: "Locataires", value: "248", change: "+18", icon: Users },
-          { label: "Incidents ouverts", value: "7", change: "-3", icon: AlertCircle },
-          { label: "Revenu mensuel", value: "186K MAD", change: "+12%", icon: BarChart3 },
-        ].map((s, i) => (
-          <div
-            key={i}
-            className="bg-[#f8fafc] rounded-xl p-4 border border-[#e5e7eb]"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <s.icon className="h-4 w-4 text-[#6b7280]" />
-              <span className="text-xs font-medium text-[#10b981]">
-                {s.change}
-              </span>
-            </div>
-            <div className="text-2xl font-bold text-[#0f1b2d]">{s.value}</div>
-            <div className="text-xs text-[#6b7280]">{s.label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Table mock */}
-      <div className="bg-[#f8fafc] rounded-xl border border-[#e5e7eb] overflow-hidden">
-        <div className="px-4 py-3 border-b border-[#e5e7eb]">
-          <span className="text-sm font-semibold text-[#0f1b2d]">
-            Paiements r&eacute;cents
-          </span>
-        </div>
-        <div className="divide-y divide-[#e5e7eb]">
-          {[
-            { tenant: "Ahmed M.", amount: "3,500 MAD", status: "Pay\u00e9", color: "text-[#10b981] bg-[#d1fae5]" },
-            { tenant: "Sara K.", amount: "4,200 MAD", status: "En attente", color: "text-yellow-700 bg-yellow-50" },
-            { tenant: "Omar B.", amount: "2,800 MAD", status: "Pay\u00e9", color: "text-[#10b981] bg-[#d1fae5]" },
-          ].map((row, i) => (
-            <div key={i} className="px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#0f1b2d] flex items-center justify-center text-white text-xs font-bold">
-                  {row.tenant.split(" ").map((n) => n[0]).join("")}
-                </div>
-                <span className="text-sm text-[#0f1b2d] font-medium">
-                  {row.tenant}
-                </span>
-              </div>
-              <span className="text-sm font-semibold text-[#0f1b2d]">
-                {row.amount}
-              </span>
-              <span
-                className={`text-xs font-medium px-2 py-1 rounded-full ${row.color}`}
-              >
-                {row.status}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ClientDashboardMock() {
-  return (
-    <div style={{ animation: "fade-in-up 0.5s ease-out" }}>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Profile card */}
-        <div className="bg-[#f8fafc] rounded-xl p-6 border border-[#e5e7eb]">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#10b981] to-[#059669] flex items-center justify-center text-white font-bold text-lg">
-              AH
-            </div>
-            <div>
-              <div className="font-bold text-[#0f1b2d]">Ahmed Hassani</div>
-              <div className="text-sm text-[#6b7280]">CLT-2024-0847</div>
-              <div className="inline-flex items-center gap-1 mt-1 text-xs font-medium text-[#10b981] bg-[#d1fae5] px-2 py-0.5 rounded-full">
-                <Trophy className="h-3 w-3" /> Gold
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3 mt-4">
-            <div className="bg-white rounded-lg p-3 border border-[#e5e7eb]">
-              <div className="text-xs text-[#6b7280]">Loyer mensuel</div>
-              <div className="text-lg font-bold text-[#0f1b2d]">3,500 MAD</div>
-            </div>
-            <div className="bg-white rounded-lg p-3 border border-[#e5e7eb]">
-              <div className="text-xs text-[#6b7280]">Points fid&eacute;lit&eacute;</div>
-              <div className="text-lg font-bold text-[#10b981]">2,450</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick actions */}
-        <div className="bg-[#f8fafc] rounded-xl p-6 border border-[#e5e7eb]">
-          <h4 className="font-semibold text-[#0f1b2d] mb-4">Actions rapides</h4>
-          <div className="space-y-3">
-            {[
-              { icon: CreditCard, label: "Payer le loyer", color: "text-[#10b981]" },
-              { icon: Wrench, label: "Signaler un incident", color: "text-orange-500" },
-              { icon: MessageSquare, label: "Envoyer un message", color: "text-blue-500" },
-              { icon: Clock, label: "T\u00e9l\u00e9charger quittance", color: "text-purple-500" },
-            ].map((action, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-3 p-3 bg-white rounded-lg border border-[#e5e7eb] hover:border-[#10b981]/30 transition-colors cursor-pointer"
-              >
-                <action.icon className={`h-5 w-5 ${action.color}`} />
-                <span className="text-sm font-medium text-[#0f1b2d]">
-                  {action.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function IncidentDashboardMock() {
-  return (
-    <div style={{ animation: "fade-in-up 0.5s ease-out" }}>
-      {/* Status summary */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        {[
-          { label: "Ouverts", value: "7", color: "text-red-500 bg-red-50" },
-          { label: "En cours", value: "12", color: "text-yellow-600 bg-yellow-50" },
-          { label: "R\u00e9solus ce mois", value: "34", color: "text-[#10b981] bg-[#d1fae5]" },
-        ].map((s, i) => (
-          <div key={i} className={`rounded-xl p-4 text-center ${s.color}`}>
-            <div className="text-2xl font-bold">{s.value}</div>
-            <div className="text-xs font-medium mt-1">{s.label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Incident list */}
-      <div className="bg-[#f8fafc] rounded-xl border border-[#e5e7eb] overflow-hidden">
-        <div className="px-4 py-3 border-b border-[#e5e7eb] flex items-center justify-between">
-          <span className="text-sm font-semibold text-[#0f1b2d]">
-            Incidents r&eacute;cents
-          </span>
-          <span className="text-xs text-[#6b7280]">Aujourd&rsquo;hui</span>
-        </div>
-        <div className="divide-y divide-[#e5e7eb]">
-          {[
-            {
-              title: "Fuite d'eau - Apt 3B",
-              priority: "Urgent",
-              pColor: "text-red-600 bg-red-50",
-              time: "Il y a 2h",
-            },
-            {
-              title: "Porte d'entr\u00e9e bloqu\u00e9e",
-              priority: "Normal",
-              pColor: "text-yellow-600 bg-yellow-50",
-              time: "Il y a 5h",
-            },
-            {
-              title: "Ampoule couloir 2e \u00e9tage",
-              priority: "Faible",
-              pColor: "text-blue-600 bg-blue-50",
-              time: "Hier",
-            },
-          ].map((inc, i) => (
-            <div key={i} className="px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="h-4 w-4 text-[#6b7280]" />
-                <span className="text-sm text-[#0f1b2d] font-medium">
-                  {inc.title}
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span
-                  className={`text-xs font-medium px-2 py-1 rounded-full ${inc.pColor}`}
-                >
-                  {inc.priority}
-                </span>
-                <span className="text-xs text-[#6b7280]">{inc.time}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
