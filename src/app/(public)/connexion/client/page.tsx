@@ -151,10 +151,10 @@ export default function ClientLogin() {
                   <span className="text-[#6b7280]">Rester connect&eacute;</span>
                 </label>
                 <Link
-                  href="#"
+                  href="/change-password"
                   className="text-[#0f1b2d] font-medium hover:underline"
                 >
-                  Mot de passe oubli&eacute; ?
+                  Mot de passe oublié ?
                 </Link>
               </div>
 

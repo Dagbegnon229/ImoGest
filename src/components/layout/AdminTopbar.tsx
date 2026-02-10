@@ -1,11 +1,32 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Search, Bell, ChevronDown, Menu, LogOut, User } from "lucide-react";
+import { Bell, ChevronDown, Menu, LogOut, User } from "lucide-react";
 import type { AuthUser } from "@/contexts/AuthContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { adminRoleLabels } from "@/lib/constants";
+
+const mockNotifications = [
+  {
+    id: 1,
+    text: "Nouvel incident signalé - APT-001",
+    time: "il y a 2h",
+    color: "bg-orange-400",
+  },
+  {
+    id: 2,
+    text: "Paiement reçu de Ahmed B.",
+    time: "il y a 5h",
+    color: "bg-green-400",
+  },
+  {
+    id: 3,
+    text: "Nouvelle demande de pré-inscription",
+    time: "il y a 1j",
+    color: "bg-blue-400",
+  },
+];
 
 interface AdminTopbarProps {
   onMenuClick: () => void;
@@ -14,11 +35,13 @@ interface AdminTopbarProps {
 
 export function AdminTopbar({ onMenuClick, user }: AdminTopbarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
   const { logout } = useAuth();
   const router = useRouter();
 
-  // Close dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -26,6 +49,12 @@ export function AdminTopbar({ onMenuClick, user }: AdminTopbarProps) {
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setDropdownOpen(false);
+      }
+      if (
+        notifRef.current &&
+        !notifRef.current.contains(event.target as Node)
+      ) {
+        setNotifOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -56,25 +85,52 @@ export function AdminTopbar({ onMenuClick, user }: AdminTopbarProps) {
         >
           <Menu className="h-6 w-6" />
         </button>
-        <div className="relative hidden sm:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6b7280]" />
-          <input
-            type="text"
-            placeholder="Rechercher..."
-            className="pl-10 pr-4 py-2 w-64 rounded-lg border border-[#e5e7eb] text-sm focus:outline-none focus:ring-2 focus:ring-[#0f1b2d] focus:border-transparent"
-          />
-        </div>
       </div>
 
       {/* Right side */}
       <div className="flex items-center gap-4">
         {/* Notifications */}
-        <button className="relative text-[#6b7280] hover:text-[#0f1b2d] transition-colors">
-          <Bell className="h-5 w-5" />
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-            3
-          </span>
-        </button>
+        <div className="relative" ref={notifRef}>
+          <button
+            onClick={() => setNotifOpen(!notifOpen)}
+            className="relative text-[#6b7280] hover:text-[#0f1b2d] transition-colors"
+          >
+            <Bell className="h-5 w-5" />
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+              3
+            </span>
+          </button>
+
+          {notifOpen && (
+            <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg border border-[#e5e7eb] shadow-lg z-50">
+              <div className="px-4 py-3 border-b border-[#e5e7eb]">
+                <p className="text-sm font-semibold text-[#0f1b2d]">Notifications</p>
+              </div>
+              <div className="py-1">
+                {mockNotifications.map((notif) => (
+                  <div
+                    key={notif.id}
+                    className="flex items-start gap-3 px-4 py-3 hover:bg-[#f8fafc] transition-colors"
+                  >
+                    <span className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.color}`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-[#0f1b2d]">{notif.text}</p>
+                      <p className="text-xs text-[#6b7280] mt-0.5">{notif.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="border-t border-[#e5e7eb]">
+                <button
+                  onClick={() => setNotifOpen(false)}
+                  className="w-full px-4 py-2.5 text-sm text-[#10b981] hover:bg-[#f8fafc] transition-colors text-center font-medium"
+                >
+                  Voir toutes les notifications
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* User dropdown */}
         <div className="relative" ref={dropdownRef}>
@@ -103,6 +159,7 @@ export function AdminTopbar({ onMenuClick, user }: AdminTopbarProps) {
               <button
                 onClick={() => {
                   setDropdownOpen(false);
+                  router.push("/admin/profile");
                 }}
                 className="flex items-center gap-2 w-full px-4 py-2 text-sm text-[#0f1b2d] hover:bg-[#f8fafc] transition-colors"
               >

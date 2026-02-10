@@ -77,6 +77,7 @@ interface DataContextType {
   // Admins
   getAdmin: (id: string) => Admin | undefined;
   addAdmin: (data: Omit<Admin, 'id' | 'createdAt'>) => Promise<Admin>;
+  updateAdmin: (id: string, data: Partial<Admin>) => Promise<void>;
 
   // Leases
   getLease: (id: string) => Lease | undefined;
@@ -727,6 +728,26 @@ export function DataProvider({ children }: { children: ReactNode }) {
       return newAdmin;
     },
     [admins],
+  );
+
+  const updateAdmin = useCallback(
+    async (id: string, data: Partial<Admin>): Promise<void> => {
+      const updatePayload: Record<string, any> = {};
+      if (data.firstName !== undefined) updatePayload.first_name = data.firstName;
+      if (data.lastName !== undefined) updatePayload.last_name = data.lastName;
+      if (data.email !== undefined) updatePayload.email = data.email;
+      if (data.phone !== undefined) updatePayload.phone = data.phone;
+      if (data.role !== undefined) updatePayload.role = data.role;
+      if (data.password !== undefined) updatePayload.password = data.password;
+      if (data.isActive !== undefined) updatePayload.is_active = data.isActive;
+
+      const { error } = await supabase.from('admins').update(updatePayload).eq('id', id);
+      if (error) throw error;
+      setAdmins((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, ...data, id: a.id } : a)),
+      );
+    },
+    [],
   );
 
   // =======================================================================
@@ -1593,6 +1614,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     // Admins
     getAdmin,
     addAdmin,
+    updateAdmin,
 
     // Leases
     getLease,

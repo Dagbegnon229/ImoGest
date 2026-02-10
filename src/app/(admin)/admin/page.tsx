@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useData } from "@/contexts/DataContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,6 +26,21 @@ import {
 export default function AdminDashboardPage() {
   const { user } = useAuth();
   const { buildings, apartments, tenants, incidents, applications } = useData();
+  const [showNewMenu, setShowNewMenu] = useState(false);
+  const newMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        newMenuRef.current &&
+        !newMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowNewMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const stats = useMemo(() => {
     const activeTenants = tenants.filter((t) => t.status === "active").length;
@@ -86,41 +101,50 @@ export default function AdminDashboardPage() {
               </Badge>
             </Link>
           )}
-          <div className="relative group">
-            <button className="inline-flex items-center gap-2 rounded-lg bg-[#10b981] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#059669] transition-colors">
+          <div className="relative" ref={newMenuRef}>
+            <button
+              onClick={() => setShowNewMenu(!showNewMenu)}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#10b981] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#059669] transition-colors"
+            >
               <Plus className="h-4 w-4" />
               Nouveau
             </button>
-            <div className="absolute right-0 mt-2 w-48 rounded-lg bg-white border border-[#e5e7eb] shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20">
-              <Link
-                href="/admin/buildings"
-                className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#171717] hover:bg-[#f8fafc] rounded-t-lg"
-              >
-                <Building2 className="h-4 w-4 text-[#6b7280]" />
-                Immeuble
-              </Link>
-              <Link
-                href="/admin/apartments"
-                className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#171717] hover:bg-[#f8fafc]"
-              >
-                <DoorOpen className="h-4 w-4 text-[#6b7280]" />
-                Appartement
-              </Link>
-              <Link
-                href="/admin/clients/new"
-                className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#171717] hover:bg-[#f8fafc]"
-              >
-                <Users className="h-4 w-4 text-[#6b7280]" />
-                Client
-              </Link>
-              <Link
-                href="/admin/incidents"
-                className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#171717] hover:bg-[#f8fafc] rounded-b-lg"
-              >
-                <AlertTriangle className="h-4 w-4 text-[#6b7280]" />
-                Incident
-              </Link>
-            </div>
+            {showNewMenu && (
+              <div className="absolute right-0 mt-2 w-48 rounded-lg bg-white border border-[#e5e7eb] shadow-lg z-20">
+                <Link
+                  href="/admin/buildings"
+                  onClick={() => setShowNewMenu(false)}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#171717] hover:bg-[#f8fafc] rounded-t-lg"
+                >
+                  <Building2 className="h-4 w-4 text-[#6b7280]" />
+                  Immeuble
+                </Link>
+                <Link
+                  href="/admin/apartments"
+                  onClick={() => setShowNewMenu(false)}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#171717] hover:bg-[#f8fafc]"
+                >
+                  <DoorOpen className="h-4 w-4 text-[#6b7280]" />
+                  Appartement
+                </Link>
+                <Link
+                  href="/admin/clients/new"
+                  onClick={() => setShowNewMenu(false)}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#171717] hover:bg-[#f8fafc]"
+                >
+                  <Users className="h-4 w-4 text-[#6b7280]" />
+                  Client
+                </Link>
+                <Link
+                  href="/admin/incidents"
+                  onClick={() => setShowNewMenu(false)}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#171717] hover:bg-[#f8fafc] rounded-b-lg"
+                >
+                  <AlertTriangle className="h-4 w-4 text-[#6b7280]" />
+                  Incident
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

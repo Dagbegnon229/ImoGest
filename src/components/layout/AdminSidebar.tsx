@@ -1,8 +1,9 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Building2, LogOut, X } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
   Building2 as Building2Icon,
@@ -38,6 +39,8 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuth();
 
   return (
     <>
@@ -98,13 +101,16 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
         {/* Logout */}
         <div className="px-3 py-4 border-t border-white/10">
-          <Link
-            href="/"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
+          <button
+            onClick={() => {
+              logout();
+              router.push("/");
+            }}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors w-full"
           >
             <LogOut className="h-5 w-5" />
-            D&eacute;connexion
-          </Link>
+            Déconnexion
+          </button>
         </div>
       </aside>
     </>
