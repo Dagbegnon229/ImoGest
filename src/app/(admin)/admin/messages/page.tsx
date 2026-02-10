@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { MessageSquare, Send, ArrowLeft, User } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import { Card, Badge, Button, EmptyState } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
 import type { Conversation } from "@/types/message";
@@ -46,6 +47,7 @@ function formatRelative(dateString: string): string {
 // ===========================================================================
 export default function AdminMessagesPage() {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const {
     conversations,
     getMessagesByConversation,
@@ -116,14 +118,18 @@ export default function AdminMessagesPage() {
     const trimmed = messageText.trim();
     if (!trimmed || !selectedConvId || !adminId) return;
 
-    await addMessage({
-      conversationId: selectedConvId,
-      senderId: adminId,
-      senderType: "admin",
-      content: trimmed,
-    });
-    setMessageText("");
-  }, [messageText, selectedConvId, adminId, addMessage]);
+    try {
+      await addMessage({
+        conversationId: selectedConvId,
+        senderId: adminId,
+        senderType: "admin",
+        content: trimmed,
+      });
+      setMessageText("");
+    } catch {
+      showToast("Erreur lors de l'envoi", "error");
+    }
+  }, [messageText, selectedConvId, adminId, addMessage, showToast]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {

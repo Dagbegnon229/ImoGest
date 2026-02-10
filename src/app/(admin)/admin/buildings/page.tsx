@@ -35,16 +35,24 @@ export default function BuildingsPage() {
   }
 
   async function handleAdd(data: Omit<Building, "id" | "createdAt">) {
-    await addBuilding(data);
-    setShowModal(false);
-    showToast("Immeuble cr\u00e9\u00e9 avec succ\u00e8s", "success");
+    try {
+      await addBuilding(data);
+      setShowModal(false);
+      showToast("Immeuble cr\u00e9\u00e9 avec succ\u00e8s", "success");
+    } catch {
+      showToast("Erreur lors de l'op\u00e9ration", "error");
+    }
   }
 
   async function handleEdit(data: Omit<Building, "id" | "createdAt">) {
     if (!editingBuilding) return;
-    await updateBuilding(editingBuilding.id, data);
-    setEditingBuilding(null);
-    showToast("Immeuble mis \u00e0 jour", "success");
+    try {
+      await updateBuilding(editingBuilding.id, data);
+      setEditingBuilding(null);
+      showToast("Immeuble modifi\u00e9 avec succ\u00e8s", "success");
+    } catch {
+      showToast("Erreur lors de l'op\u00e9ration", "error");
+    }
   }
 
   async function handleDelete(id: string) {
@@ -53,8 +61,12 @@ export default function BuildingsPage() {
       showToast("Impossible de supprimer un immeuble avec des appartements", "error");
       return;
     }
-    await deleteBuilding(id);
-    showToast("Immeuble supprim\u00e9", "success");
+    try {
+      await deleteBuilding(id);
+      showToast("Immeuble supprim\u00e9 avec succ\u00e8s", "success");
+    } catch {
+      showToast("Erreur lors de l'op\u00e9ration", "error");
+    }
   }
 
   return (

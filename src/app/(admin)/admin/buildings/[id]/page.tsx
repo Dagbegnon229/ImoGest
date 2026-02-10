@@ -79,9 +79,13 @@ export default function BuildingDetailPage() {
   }
 
   async function handleUpdate(data: Omit<Building, "id" | "createdAt">) {
-    await updateBuilding(buildingId, data);
-    setShowEditModal(false);
-    showToast("Immeuble mis \u00e0 jour", "success");
+    try {
+      await updateBuilding(buildingId, data);
+      setShowEditModal(false);
+      showToast("Immeuble modifi\u00e9 avec succ\u00e8s", "success");
+    } catch {
+      showToast("Erreur lors de l'op\u00e9ration", "error");
+    }
   }
 
   function getTenantName(tenantId: string | null): string {

@@ -91,17 +91,25 @@ export default function ApartmentDetailPage() {
   ];
 
   async function handleEditSubmit(data: Omit<Apartment, "id">) {
-    await updateApartment(aptId, data);
-    setShowEditModal(false);
-    showToast("Appartement mis \u00e0 jour", "success");
+    try {
+      await updateApartment(aptId, data);
+      setShowEditModal(false);
+      showToast("Appartement modifi\u00e9 avec succ\u00e8s", "success");
+    } catch {
+      showToast("Erreur lors de l'op\u00e9ration", "error");
+    }
   }
 
   async function handleStatusChange() {
     if (!newStatus) return;
-    await updateApartment(aptId, { status: newStatus as Apartment["status"] });
-    setShowStatusModal(false);
-    setNewStatus("");
-    showToast("Statut mis \u00e0 jour", "success");
+    try {
+      await updateApartment(aptId, { status: newStatus as Apartment["status"] });
+      setShowStatusModal(false);
+      setNewStatus("");
+      showToast("Appartement modifi\u00e9 avec succ\u00e8s", "success");
+    } catch {
+      showToast("Erreur lors de l'op\u00e9ration", "error");
+    }
   }
 
   return (

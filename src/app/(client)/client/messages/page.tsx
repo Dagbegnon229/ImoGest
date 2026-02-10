@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { MessageSquare, Send, Plus, ArrowLeft, User } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import { Card, Badge, Button, EmptyState, Input, Modal, Textarea } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
 import type { Conversation } from "@/types/message";
@@ -46,6 +47,7 @@ function formatRelative(dateString: string): string {
 // ===========================================================================
 export default function ClientMessagesPage() {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const {
     getConversationsByTenant,
     getMessagesByConversation,
@@ -120,14 +122,18 @@ export default function ClientMessagesPage() {
     const trimmed = messageText.trim();
     if (!trimmed || !selectedConvId || !tenantId) return;
 
-    await addMessage({
-      conversationId: selectedConvId,
-      senderId: tenantId,
-      senderType: "client",
-      content: trimmed,
-    });
-    setMessageText("");
-  }, [messageText, selectedConvId, tenantId, addMessage]);
+    try {
+      await addMessage({
+        conversationId: selectedConvId,
+        senderId: tenantId,
+        senderType: "client",
+        content: trimmed,
+      });
+      setMessageText("");
+    } catch {
+      showToast("Erreur lors de l'envoi", "error");
+    }
+  }, [messageText, selectedConvId, tenantId, addMessage, showToast]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -147,25 +153,29 @@ export default function ClientMessagesPage() {
     // Default admin assignment
     const adminId = admins.length > 0 ? admins[0].id : "ADM-0001";
 
-    const conv = await addConversation({
-      tenantId,
-      adminId,
-      subject: trimmedSubject,
-    });
+    try {
+      const conv = await addConversation({
+        tenantId,
+        adminId,
+        subject: trimmedSubject,
+      });
 
-    await addMessage({
-      conversationId: conv.id,
-      senderId: tenantId,
-      senderType: "client",
-      content: trimmedMsg,
-    });
+      await addMessage({
+        conversationId: conv.id,
+        senderId: tenantId,
+        senderType: "client",
+        content: trimmedMsg,
+      });
 
-    setNewSubject("");
-    setNewMessage("");
-    setShowNewModal(false);
-    setSelectedConvId(conv.id);
-    setMobileShowChat(true);
-  }, [newSubject, newMessage, tenantId, admins, addConversation, addMessage]);
+      setNewSubject("");
+      setNewMessage("");
+      setShowNewModal(false);
+      setSelectedConvId(conv.id);
+      setMobileShowChat(true);
+    } catch {
+      showToast("Erreur lors de la cr\u00e9ation", "error");
+    }
+  }, [newSubject, newMessage, tenantId, admins, addConversation, addMessage, showToast]);
 
   const handleBack = useCallback(() => {
     setMobileShowChat(false);

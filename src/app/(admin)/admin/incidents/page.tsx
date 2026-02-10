@@ -86,12 +86,16 @@ export default function IncidentsPage() {
   }
 
   async function handleAdd(data: Omit<Incident, "id" | "createdAt">) {
-    await addIncident({
-      ...data,
-      reportedBy: user?.id ?? "",
-    });
-    setShowModal(false);
-    showToast("Incident cr\u00e9\u00e9 avec succ\u00e8s", "success");
+    try {
+      await addIncident({
+        ...data,
+        reportedBy: user?.id ?? "",
+      });
+      setShowModal(false);
+      showToast("Incident cr\u00e9\u00e9 avec succ\u00e8s", "success");
+    } catch {
+      showToast("Erreur lors de l'op\u00e9ration", "error");
+    }
   }
 
   return (

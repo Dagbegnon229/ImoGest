@@ -105,8 +105,12 @@ export default function IncidentDetailPage() {
       updates.resolvedAt = new Date().toISOString();
     }
 
-    await updateIncident(incidentId, updates);
-    showToast("Incident mis \u00e0 jour", "success");
+    try {
+      await updateIncident(incidentId, updates);
+      showToast("Incident modifi\u00e9 avec succ\u00e8s", "success");
+    } catch {
+      showToast("Erreur lors de l'op\u00e9ration", "error");
+    }
   }
 
   return (

@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/components/ui/Toast";
+import { useToast } from "@/contexts/ToastContext";
 import { Card, Button, Input, Badge } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
 import { tenantStatusLabels, tenantStatusColors } from "@/lib/constants";
@@ -21,7 +21,7 @@ import { tenantStatusLabels, tenantStatusColors } from "@/lib/constants";
 export default function ProfilePage() {
   const { user } = useAuth();
   const { tenants, updateTenant } = useData();
-  const { toast } = useToast();
+  const { showToast } = useToast();
 
   const tenant = useMemo(
     () => tenants.find((t) => t.id === user?.id),
@@ -71,18 +71,9 @@ export default function ProfilePage() {
         email: email.trim(),
         phone: phone.trim(),
       });
-      toast({
-        type: "success",
-        title: "Profil mis à jour",
-        description: "Vos informations personnelles ont été enregistrées.",
-      });
+      showToast("Profil mis à jour avec succès", "success");
     } catch {
-      toast({
-        type: "error",
-        title: "Erreur",
-        description:
-          "Une erreur est survenue lors de la mise à jour du profil.",
-      });
+      showToast("Erreur lors de la mise à jour du profil", "error");
     } finally {
       setIsSavingInfo(false);
     }
@@ -119,22 +110,13 @@ export default function ProfilePage() {
         password: newPassword,
         mustChangePassword: false,
       });
-      toast({
-        type: "success",
-        title: "Mot de passe modifié",
-        description: "Votre mot de passe a été mis à jour avec succès.",
-      });
+      showToast("Mot de passe modifié avec succès", "success");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
       setPasswordErrors({});
     } catch {
-      toast({
-        type: "error",
-        title: "Erreur",
-        description:
-          "Une erreur est survenue lors du changement de mot de passe.",
-      });
+      showToast("Erreur lors du changement de mot de passe", "error");
     } finally {
       setIsSavingPassword(false);
     }

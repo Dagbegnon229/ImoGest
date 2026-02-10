@@ -81,19 +81,31 @@ export default function ClientDetailPage() {
     email: string;
     phone: string;
   }) {
-    await updateTenant(tenantId, data);
-    setShowEditModal(false);
-    showToast("Informations mises \u00e0 jour", "success");
+    try {
+      await updateTenant(tenantId, data);
+      setShowEditModal(false);
+      showToast("Client modifi\u00e9 avec succ\u00e8s", "success");
+    } catch {
+      showToast("Erreur lors de l'op\u00e9ration", "error");
+    }
   }
 
   async function handleSuspend() {
-    await updateTenant(tenantId, { status: "suspended" });
-    showToast("Client suspendu", "success");
+    try {
+      await updateTenant(tenantId, { status: "suspended" });
+      showToast("Client suspendu avec succ\u00e8s", "success");
+    } catch {
+      showToast("Erreur lors de l'op\u00e9ration", "error");
+    }
   }
 
   async function handleReactivate() {
-    await updateTenant(tenantId, { status: "active" });
-    showToast("Client r\u00e9activ\u00e9", "success");
+    try {
+      await updateTenant(tenantId, { status: "active" });
+      showToast("Client r\u00e9activ\u00e9 avec succ\u00e8s", "success");
+    } catch {
+      showToast("Erreur lors de l'op\u00e9ration", "error");
+    }
   }
 
   return (

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, Send, Building2, Home } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/components/ui/Toast";
+import { useToast } from "@/contexts/ToastContext";
 import { Card, Button, Input, Textarea, Select, EmptyState } from "@/components/ui";
 import type { IncidentPriority } from "@/types/incident";
 
@@ -20,7 +20,7 @@ const priorityOptions = [
 export default function NewIncidentPage() {
   const { user } = useAuth();
   const { tenants, getBuilding, getApartment, addIncident } = useData();
-  const { toast } = useToast();
+  const { showToast } = useToast();
   const router = useRouter();
 
   const tenant = useMemo(
@@ -101,19 +101,11 @@ export default function NewIncidentPage() {
         resolvedAt: null,
       });
 
-      toast({
-        type: "success",
-        title: "Incident signalé avec succès",
-        description: "Votre incident a été enregistré et sera traité prochainement.",
-      });
+      showToast("Incident signalé avec succès", "success");
 
       router.push("/client/incidents");
     } catch {
-      toast({
-        type: "error",
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la création de l'incident.",
-      });
+      showToast("Erreur lors de la création de l'incident", "error");
       setIsSubmitting(false);
     }
   }

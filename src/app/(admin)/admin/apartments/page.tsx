@@ -65,16 +65,24 @@ export default function ApartmentsPage() {
   }
 
   async function handleAdd(data: Omit<Apartment, "id">) {
-    await addApartment(data);
-    setShowModal(false);
-    showToast("Appartement cr\u00e9\u00e9 avec succ\u00e8s", "success");
+    try {
+      await addApartment(data);
+      setShowModal(false);
+      showToast("Appartement cr\u00e9\u00e9 avec succ\u00e8s", "success");
+    } catch {
+      showToast("Erreur lors de l'op\u00e9ration", "error");
+    }
   }
 
   async function handleEdit(data: Omit<Apartment, "id">) {
     if (!editingApt) return;
-    await updateApartment(editingApt.id, data);
-    setEditingApt(null);
-    showToast("Appartement mis \u00e0 jour", "success");
+    try {
+      await updateApartment(editingApt.id, data);
+      setEditingApt(null);
+      showToast("Appartement modifi\u00e9 avec succ\u00e8s", "success");
+    } catch {
+      showToast("Erreur lors de l'op\u00e9ration", "error");
+    }
   }
 
   return (
