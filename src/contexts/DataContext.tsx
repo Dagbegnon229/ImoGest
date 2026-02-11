@@ -219,6 +219,7 @@ async function fetchApartments(): Promise<Apartment[]> {
     rent: row.rent,
     status: row.status,
     tenantId: row.tenant_id,
+    images: row.images ?? [],
   } as Apartment));
 }
 
@@ -593,6 +594,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           rent: data.rent,
           status: data.status,
           tenant_id: data.tenantId,
+          images: data.images ?? [],
         })
         .select()
         .single();
@@ -607,6 +609,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         rent: row.rent,
         status: row.status,
         tenantId: row.tenant_id,
+        images: row.images ?? [],
       };
       setApartments((prev) => [...prev, newApt]);
       return newApt;

@@ -60,6 +60,7 @@ export function ApartmentForm({ initialData, onSubmit, onClose }: ApartmentFormP
       rent: Number(rent),
       status: status as Apartment["status"],
       tenantId: initialData?.tenantId ?? null,
+      images: initialData?.images ?? [],
     });
   }
 

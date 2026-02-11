@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -7,6 +8,7 @@ interface StatsCardProps {
   change?: number;
   icon?: ReactNode;
   className?: string;
+  href?: string;
 }
 
 export function StatsCard({
@@ -15,14 +17,13 @@ export function StatsCard({
   change,
   icon,
   className = "",
+  href,
 }: StatsCardProps) {
   const isPositive = change !== undefined && change >= 0;
   const isNegative = change !== undefined && change < 0;
 
-  return (
-    <div
-      className={`bg-white rounded-xl border border-[#e5e7eb] p-6 ${className}`}
-    >
+  const content = (
+    <>
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <p className="text-sm font-medium text-[#6b7280]">{label}</p>
@@ -54,6 +55,25 @@ export function StatsCard({
           <span className="text-sm text-[#6b7280]">vs last month</span>
         </div>
       )}
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className={`block bg-white rounded-xl border border-[#e5e7eb] p-6 hover:border-[#10b981] hover:shadow-md transition-all cursor-pointer group ${className}`}
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <div
+      className={`bg-white rounded-xl border border-[#e5e7eb] p-6 ${className}`}
+    >
+      {content}
     </div>
   );
 }

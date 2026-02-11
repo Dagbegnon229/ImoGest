@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useData } from "@/contexts/DataContext";
 import { useToast } from "@/contexts/ToastContext";
 import { Card, Button, Badge, Modal, Select, EmptyState } from "@/components/ui";
 import { ApartmentForm } from "@/components/forms/ApartmentForm";
+import { uploadFile } from "@/lib/supabase";
 import {
   ArrowLeft,
   DoorOpen,
@@ -14,6 +15,12 @@ import {
   User,
   FileText,
   AlertTriangle,
+  ImagePlus,
+  Trash2,
+  X,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   apartmentStatusLabels,
@@ -45,6 +52,10 @@ export default function ApartmentDetailPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [newStatus, setNewStatus] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const [deletingImgIdx, setDeletingImgIdx] = useState<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const building = apartment ? getBuilding(apartment.buildingId) : undefined;
   const tenant = apartment?.tenantId ? getTenant(apartment.tenantId) : undefined;
@@ -106,9 +117,45 @@ export default function ApartmentDetailPage() {
       await updateApartment(aptId, { status: newStatus as Apartment["status"] });
       setShowStatusModal(false);
       setNewStatus("");
-      showToast("Appartement modifi\u00e9 avec succ\u00e8s", "success");
+      showToast("Appartement modifié avec succès", "success");
     } catch {
-      showToast("Erreur lors de l'op\u00e9ration", "error");
+      showToast("Erreur lors de l'opération", "error");
+    }
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !apartment) return;
+
+    setUploading(true);
+    try {
+      const newImages = [...(apartment.images || [])];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const path = `${aptId}/${Date.now()}-${file.name}`;
+        const { url } = await uploadFile("apartment-images", path, file);
+        newImages.push(url);
+      }
+      await updateApartment(aptId, { images: newImages });
+      showToast(`${files.length} photo(s) ajoutée(s)`, "success");
+    } catch {
+      showToast("Erreur lors de l'upload", "error");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
+
+  async function handleDeleteImage(idx: number) {
+    if (!apartment) return;
+    try {
+      const newImages = apartment.images.filter((_, i) => i !== idx);
+      await updateApartment(aptId, { images: newImages });
+      setDeletingImgIdx(null);
+      if (lightboxIdx !== null) setLightboxIdx(null);
+      showToast("Photo supprimée", "success");
+    } catch {
+      showToast("Erreur lors de la suppression", "error");
     }
   }
 
@@ -256,6 +303,146 @@ export default function ApartmentDetailPage() {
             </div>
           </dl>
         </Card>
+      )}
+
+      {/* Photos du logement */}
+      <Card
+        header={
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ImagePlus className="h-4 w-4 text-[#6b7280]" />
+              <h2 className="font-semibold text-[#171717]">
+                Photos du logement
+                {apartment.images.length > 0 && (
+                  <span className="ml-2 text-xs font-normal text-[#6b7280]">
+                    ({apartment.images.length})
+                  </span>
+                )}
+              </h2>
+            </div>
+            <div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Upload...
+                  </>
+                ) : (
+                  <>
+                    <ImagePlus className="h-4 w-4" />
+                    Ajouter des photos
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        }
+      >
+        {apartment.images.length === 0 ? (
+          <div className="text-center py-8">
+            <ImagePlus className="h-10 w-10 text-[#d1d5db] mx-auto mb-3" />
+            <p className="text-sm text-[#6b7280]">Aucune photo ajoutée</p>
+            <p className="text-xs text-[#9ca3af] mt-1">
+              Cliquez sur &quot;Ajouter des photos&quot; pour uploader des images
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {apartment.images.map((url, idx) => (
+              <div
+                key={idx}
+                className="relative group rounded-xl overflow-hidden border border-[#e5e7eb] aspect-[4/3]"
+              >
+                <img
+                  src={url}
+                  alt={`Photo ${idx + 1}`}
+                  className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-200"
+                  onClick={() => setLightboxIdx(idx)}
+                />
+                {/* Overlay on hover */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-start justify-end p-2">
+                  {deletingImgIdx === idx ? (
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDeleteImage(idx); }}
+                        className="px-2 py-1 bg-red-500 text-white text-xs font-medium rounded-lg hover:bg-red-600 transition-colors"
+                      >
+                        Confirmer
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setDeletingImgIdx(null); }}
+                        className="px-2 py-1 bg-white text-[#374151] text-xs font-medium rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        Non
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setDeletingImgIdx(idx); }}
+                      className="p-1.5 bg-white/90 rounded-lg text-red-500 hover:bg-white hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+                      title="Supprimer"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+
+      {/* Lightbox */}
+      {lightboxIdx !== null && apartment.images[lightboxIdx] && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center"
+          onClick={() => setLightboxIdx(null)}
+        >
+          <button
+            className="absolute top-4 right-4 p-2 text-white/80 hover:text-white transition-colors"
+            onClick={() => setLightboxIdx(null)}
+          >
+            <X className="h-6 w-6" />
+          </button>
+          {lightboxIdx > 0 && (
+            <button
+              className="absolute left-4 p-2 text-white/80 hover:text-white transition-colors"
+              onClick={(e) => { e.stopPropagation(); setLightboxIdx(lightboxIdx - 1); }}
+            >
+              <ChevronLeft className="h-8 w-8" />
+            </button>
+          )}
+          {lightboxIdx < apartment.images.length - 1 && (
+            <button
+              className="absolute right-4 p-2 text-white/80 hover:text-white transition-colors"
+              onClick={(e) => { e.stopPropagation(); setLightboxIdx(lightboxIdx + 1); }}
+            >
+              <ChevronRight className="h-8 w-8" />
+            </button>
+          )}
+          <img
+            src={apartment.images[lightboxIdx]}
+            alt={`Photo ${lightboxIdx + 1}`}
+            className="max-h-[85vh] max-w-[90vw] object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="absolute bottom-4 text-white/70 text-sm">
+            {lightboxIdx + 1} / {apartment.images.length}
+          </div>
+        </div>
       )}
 
       {/* Incidents */}

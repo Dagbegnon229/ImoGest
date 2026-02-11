@@ -155,21 +155,25 @@ export default function AdminDashboardPage() {
           label="Immeubles"
           value={stats.buildings}
           icon={<Building2 className="h-6 w-6" />}
+          href="/admin/buildings"
         />
         <StatsCard
           label="Appartements"
           value={stats.apartments}
           icon={<DoorOpen className="h-6 w-6" />}
+          href="/admin/apartments"
         />
         <StatsCard
           label="Locataires actifs"
           value={stats.activeTenants}
           icon={<Users className="h-6 w-6" />}
+          href="/admin/clients"
         />
         <StatsCard
           label="Incidents ouverts"
           value={stats.openIncidents}
           icon={<AlertTriangle className="h-6 w-6" />}
+          href="/admin/incidents"
         />
       </div>
 

@@ -101,6 +101,7 @@ export function toApartment(row: any): Apartment {
     rent: row.rent,
     status: row.status,
     tenantId: row.tenant_id,
+    images: row.images ?? [],
   };
 }
 
@@ -115,6 +116,7 @@ export function fromApartment(apartment: Apartment): any {
     rent: apartment.rent,
     status: apartment.status,
     tenant_id: apartment.tenantId,
+    images: apartment.images ?? [],
   };
 }
 

@@ -10,4 +10,5 @@ export interface Apartment {
   rent: number;
   status: ApartmentStatus;
   tenantId: string | null;
+  images: string[]; // URLs des photos du logement
 }
