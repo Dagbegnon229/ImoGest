@@ -20,12 +20,12 @@ export function formatDate(dateString: string): string {
 }
 
 /**
- * Format a number as currency (MAD - Moroccan Dirham).
+ * Format a number as currency (CAD - Dollar canadien).
  */
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("fr-MA", {
+  return new Intl.NumberFormat("fr-CA", {
     style: "currency",
-    currency: "MAD",
+    currency: "CAD",
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   }).format(amount);

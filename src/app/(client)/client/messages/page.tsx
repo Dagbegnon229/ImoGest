@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { MessageSquare, Send, Plus, ArrowLeft, User } from "lucide-react";
+import { MessageSquare, Send, Plus, ArrowLeft, User, Loader2, Trash2 } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { Card, Badge, Button, EmptyState, Input, Modal, Textarea } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
+import { uploadMultipleFiles } from "@/lib/supabase";
+import { AttachmentPreview } from "@/components/chat/AttachmentPreview";
+import { FileUploadButton } from "@/components/chat/FileUploadButton";
 import type { Conversation } from "@/types/message";
 
 // ---------------------------------------------------------------------------
@@ -54,6 +57,7 @@ export default function ClientMessagesPage() {
     getAdmin,
     addConversation,
     addMessage,
+    deleteMessage,
     markMessagesRead,
     admins,
   } = useData();
@@ -65,6 +69,9 @@ export default function ClientMessagesPage() {
   const [newSubject, setNewSubject] = useState("");
   const [newMessage, setNewMessage] = useState("");
   const [mobileShowChat, setMobileShowChat] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [isSending, setIsSending] = useState(false);
+  const [deletingMsgId, setDeletingMsgId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -120,20 +127,33 @@ export default function ClientMessagesPage() {
 
   const handleSendMessage = useCallback(async () => {
     const trimmed = messageText.trim();
-    if (!trimmed || !selectedConvId || !tenantId) return;
+    if ((!trimmed && attachedFiles.length === 0) || !selectedConvId || !tenantId) return;
 
+    setIsSending(true);
     try {
+      let attachments: { name: string; url: string; size: number; type: string }[] = [];
+      if (attachedFiles.length > 0) {
+        attachments = await uploadMultipleFiles(
+          "message-attachments",
+          `${selectedConvId}/${tenantId}`,
+          attachedFiles,
+        );
+      }
       await addMessage({
         conversationId: selectedConvId,
         senderId: tenantId,
         senderType: "client",
-        content: trimmed,
+        content: trimmed || (attachments.length > 0 ? `📎 ${attachments.length} fichier(s)` : ""),
+        attachments,
       });
       setMessageText("");
+      setAttachedFiles([]);
     } catch {
       showToast("Erreur lors de l'envoi", "error");
+    } finally {
+      setIsSending(false);
     }
-  }, [messageText, selectedConvId, tenantId, addMessage, showToast]);
+  }, [messageText, attachedFiles, selectedConvId, tenantId, addMessage, showToast]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -165,6 +185,7 @@ export default function ClientMessagesPage() {
         senderId: tenantId,
         senderType: "client",
         content: trimmedMsg,
+        attachments: [],
       });
 
       setNewSubject("");
@@ -180,6 +201,16 @@ export default function ClientMessagesPage() {
   const handleBack = useCallback(() => {
     setMobileShowChat(false);
   }, []);
+
+  const handleDeleteMessage = useCallback(async (msgId: string) => {
+    try {
+      await deleteMessage(msgId);
+      setDeletingMsgId(null);
+      showToast("Message supprimé", "success");
+    } catch {
+      showToast("Erreur lors de la suppression", "error");
+    }
+  }, [deleteMessage, showToast]);
 
   // --- Helpers for rendering -----------------------------------------------
   const getLastMessagePreview = useCallback(
@@ -385,7 +416,36 @@ export default function ClientMessagesPage() {
                               </span>
                             </div>
                           )}
-                          <div className={`flex ${isClient ? "justify-end" : "justify-start"}`}>
+                          <div className={`flex ${isClient ? "justify-end" : "justify-start"} group/msg`}>
+                            {/* Delete button - left of own messages (client only) */}
+                            {isClient && (
+                              <div className="flex items-center mr-1.5 opacity-0 group-hover/msg:opacity-100 transition-opacity">
+                                {deletingMsgId === msg.id ? (
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      onClick={() => handleDeleteMessage(msg.id)}
+                                      className="text-[10px] font-medium text-red-600 bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition-colors"
+                                    >
+                                      Supprimer
+                                    </button>
+                                    <button
+                                      onClick={() => setDeletingMsgId(null)}
+                                      className="text-[10px] font-medium text-[#6b7280] hover:text-[#374151] px-1.5 py-1 rounded transition-colors"
+                                    >
+                                      Non
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => setDeletingMsgId(msg.id)}
+                                    className="p-1.5 rounded-lg hover:bg-red-50 text-[#9ca3af] hover:text-red-500 transition-colors"
+                                    title="Supprimer"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </button>
+                                )}
+                              </div>
+                            )}
                             <div
                               className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                                 isClient
@@ -393,9 +453,12 @@ export default function ClientMessagesPage() {
                                   : "bg-white text-[#0f1b2d] border border-[#e5e7eb] rounded-bl-md"
                               }`}
                             >
-                              <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
-                                {msg.content}
-                              </p>
+                              {msg.content && (
+                                <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
+                                  {msg.content}
+                                </p>
+                              )}
+                              <AttachmentPreview attachments={msg.attachments} isOwn={isClient} />
                               <p
                                 className={`text-[10px] mt-1 text-right ${
                                   isClient ? "text-white/70" : "text-[#6b7280]"
@@ -415,6 +478,11 @@ export default function ClientMessagesPage() {
 
               {/* Message input */}
               <div className="px-4 py-3 border-t border-[#e5e7eb] bg-white">
+                <FileUploadButton
+                  selectedFiles={attachedFiles}
+                  onFilesSelected={(files) => setAttachedFiles((prev) => [...prev, ...files])}
+                  onRemoveFile={(idx) => setAttachedFiles((prev) => prev.filter((_, i) => i !== idx))}
+                />
                 <div className="flex items-end gap-2">
                   <div className="flex-1">
                     <textarea
@@ -436,10 +504,10 @@ export default function ClientMessagesPage() {
                     variant="secondary"
                     size="sm"
                     onClick={handleSendMessage}
-                    disabled={!messageText.trim()}
+                    disabled={isSending || (!messageText.trim() && attachedFiles.length === 0)}
                     className="h-[42px] w-[42px] !p-0 flex-shrink-0"
                   >
-                    <Send className="h-4 w-4" />
+                    {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   </Button>
                 </div>
               </div>

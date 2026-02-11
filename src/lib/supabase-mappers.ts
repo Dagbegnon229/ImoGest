@@ -246,6 +246,7 @@ export function toPendingApplication(row: any): PendingApplication {
     password: row.password,
     housingPreference: row.housing_preference,
     documents: row.documents ?? [],
+    documentFiles: row.document_files ?? [],
     status: row.status,
     reviewedBy: row.reviewed_by,
     reviewNote: row.review_note,
@@ -264,6 +265,7 @@ export function fromPendingApplication(application: PendingApplication): any {
     password: application.password,
     housing_preference: application.housingPreference,
     documents: application.documents,
+    document_files: application.documentFiles ?? [],
     status: application.status,
     reviewed_by: application.reviewedBy,
     review_note: application.reviewNote,
@@ -409,6 +411,7 @@ export function toMessage(row: any): Message {
     senderId: row.sender_id,
     senderType: row.sender_type,
     content: row.content,
+    attachments: row.attachments ?? [],
     readAt: row.read_at,
     createdAt: row.created_at,
   };
@@ -421,6 +424,7 @@ export function fromMessage(message: Message): any {
     sender_id: message.senderId,
     sender_type: message.senderType,
     content: message.content,
+    attachments: message.attachments ?? [],
     read_at: message.readAt,
     created_at: message.createdAt,
   };

@@ -12,13 +12,13 @@ import { supabase } from '@/lib/supabase';
 import type { Building } from '@/types/building';
 import type { Apartment } from '@/types/apartment';
 import type { Tenant } from '@/types/tenant';
-import type { Admin } from '@/types/admin';
+import type { Admin, CustomRole } from '@/types/admin';
 import type { Lease } from '@/types/lease';
 import type { Incident } from '@/types/incident';
 import type { PendingApplication } from '@/types/application';
 import type { Payment } from '@/types/payment';
 import type { PointsTransaction, LoyaltyProfile } from '@/types/points';
-import type { Message, Conversation } from '@/types/message';
+import type { Message, MessageAttachment, Conversation } from '@/types/message';
 import type { TenantDocument } from '@/types/document';
 import {
   generateBuildingId,
@@ -80,6 +80,11 @@ interface DataContextType {
   addAdmin: (data: Omit<Admin, 'id' | 'createdAt'>) => Promise<Admin>;
   updateAdmin: (id: string, data: Partial<Admin>) => Promise<void>;
 
+  // Custom Roles
+  customRoles: CustomRole[];
+  addCustomRole: (data: Omit<CustomRole, 'id' | 'createdAt'>) => Promise<CustomRole>;
+  deleteCustomRole: (id: string) => Promise<void>;
+
   // Leases
   getLease: (id: string) => Lease | undefined;
   getLeaseByTenant: (tenantId: string) => Lease | undefined;
@@ -136,6 +141,7 @@ interface DataContextType {
     data: Omit<Conversation, 'id' | 'createdAt' | 'lastMessageAt' | 'unreadAdmin' | 'unreadClient'>,
   ) => Promise<Conversation>;
   addMessage: (data: Omit<Message, 'id' | 'createdAt' | 'readAt'>) => Promise<Message>;
+  deleteMessage: (id: string) => Promise<void>;
   markMessagesRead: (conversationId: string, readerType: 'admin' | 'client') => Promise<void>;
 
   // Documents
@@ -165,6 +171,20 @@ async function fetchAdmins(): Promise<Admin[]> {
     createdAt: row.created_at,
     createdBy: row.created_by,
   } as Admin));
+}
+
+async function fetchCustomRoles(): Promise<CustomRole[]> {
+  const { data, error } = await supabase.from('custom_roles').select('*').order('created_at', { ascending: true });
+  if (error) { console.error('Error fetching custom_roles:', error); return []; }
+  return (data || []).map((row: any) => ({
+    id: row.id,
+    name: row.name,
+    label: row.label,
+    color: row.color,
+    description: row.description || '',
+    createdAt: row.created_at,
+    createdBy: row.created_by,
+  } as CustomRole));
 }
 
 async function fetchBuildings(): Promise<Building[]> {
@@ -270,7 +290,8 @@ async function fetchApplications(): Promise<PendingApplication[]> {
     phone: row.phone,
     password: row.password,
     housingPreference: row.housing_preference,
-    documents: row.documents,
+    documents: row.documents ?? [],
+    documentFiles: row.document_files ?? [],
     status: row.status,
     reviewedBy: row.reviewed_by,
     reviewNote: row.review_note,
@@ -351,6 +372,7 @@ async function fetchMessages(): Promise<Message[]> {
     senderId: row.sender_id,
     senderType: row.sender_type,
     content: row.content,
+    attachments: row.attachments ?? [],
     readAt: row.read_at,
     createdAt: row.created_at,
   } as Message));
@@ -386,6 +408,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [apartments, setApartments] = useState<Apartment[]>([]);
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [admins, setAdmins] = useState<Admin[]>([]);
+  const [customRoles, setCustomRoles] = useState<CustomRole[]>([]);
   const [leases, setLeases] = useState<Lease[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [applications, setApplications] = useState<PendingApplication[]>([]);
@@ -409,7 +432,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     try {
       const [
-        bldgs, apts, tnts, lses, incs, adms, apps, pmts, pts, lps, convs, msgs, docs,
+        bldgs, apts, tnts, lses, incs, adms, cRoles, apps, pmts, pts, lps, convs, msgs, docs,
       ] = await Promise.all([
         fetchBuildings(),
         fetchApartments(),
@@ -417,6 +440,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         fetchLeases(),
         fetchIncidents(),
         fetchAdmins(),
+        fetchCustomRoles(),
         fetchApplications(),
         fetchPayments(),
         fetchPointsTransactions(),
@@ -431,6 +455,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setLeases(lses);
       setIncidents(incs);
       setAdmins(adms);
+      setCustomRoles(cRoles);
       setApplications(apps);
       setPayments(pmts);
       setPointsTransactions(pts);
@@ -806,6 +831,50 @@ export function DataProvider({ children }: { children: ReactNode }) {
   );
 
   // =======================================================================
+  // CUSTOM ROLES
+  // =======================================================================
+
+  const addCustomRole = useCallback(
+    async (data: Omit<CustomRole, 'id' | 'createdAt'>): Promise<CustomRole> => {
+      const id = `ROLE-${Date.now()}`;
+      const { data: row, error } = await supabase
+        .from('custom_roles')
+        .insert({
+          id,
+          name: data.name,
+          label: data.label,
+          color: data.color,
+          description: data.description,
+          created_by: data.createdBy,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      const newRole: CustomRole = {
+        id: row.id,
+        name: row.name,
+        label: row.label,
+        color: row.color,
+        description: row.description || '',
+        createdAt: row.created_at,
+        createdBy: row.created_by,
+      };
+      setCustomRoles((prev) => [...prev, newRole]);
+      return newRole;
+    },
+    [],
+  );
+
+  const deleteCustomRole = useCallback(
+    async (id: string): Promise<void> => {
+      const { error } = await supabase.from('custom_roles').delete().eq('id', id);
+      if (error) throw error;
+      setCustomRoles((prev) => prev.filter((r) => r.id !== id));
+    },
+    [],
+  );
+
+  // =======================================================================
   // LEASES
   // =======================================================================
 
@@ -989,6 +1058,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           password: data.password,
           housing_preference: data.housingPreference,
           documents: data.documents,
+          document_files: data.documentFiles ?? [],
           status: 'pending_review',
           reviewed_by: null,
           review_note: null,
@@ -1005,7 +1075,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         phone: row.phone,
         password: row.password,
         housingPreference: row.housing_preference,
-        documents: row.documents,
+        documents: row.documents ?? [],
+        documentFiles: row.document_files ?? [],
         status: row.status,
         reviewedBy: row.reviewed_by,
         reviewNote: row.review_note,
@@ -1482,6 +1553,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           sender_id: data.senderId,
           sender_type: data.senderType,
           content: data.content,
+          attachments: data.attachments ?? [],
           read_at: null,
         })
         .select()
@@ -1493,6 +1565,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         senderId: row.sender_id,
         senderType: row.sender_type,
         content: row.content,
+        attachments: row.attachments ?? [],
         readAt: row.read_at,
         createdAt: row.created_at,
       };
@@ -1531,6 +1604,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
       return newMsg;
     },
     [messages, conversations],
+  );
+
+  const deleteMessage = useCallback(
+    async (id: string): Promise<void> => {
+      const { error } = await supabase.from('messages').delete().eq('id', id);
+      if (error) throw error;
+      setMessages((prev) => prev.filter((m) => m.id !== id));
+    },
+    [],
   );
 
   const markMessagesRead = useCallback(
@@ -1674,6 +1756,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
     addAdmin,
     updateAdmin,
 
+    // Custom Roles
+    customRoles,
+    addCustomRole,
+    deleteCustomRole,
+
     // Leases
     getLease,
     getLeaseByTenant,
@@ -1712,6 +1799,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     getMessagesByConversation,
     addConversation,
     addMessage,
+    deleteMessage,
     markMessagesRead,
 
     // Documents

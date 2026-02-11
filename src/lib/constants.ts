@@ -39,6 +39,27 @@ export const adminRoleLabels: Record<string, string> = {
   admin_support: 'Support',
 };
 
+// ── Colors: Admin Roles ──────────────────────────────────────────────────────
+
+export const adminRoleColors: Record<string, string> = {
+  super_admin: 'bg-purple-100 text-purple-800',
+  admin_manager: 'bg-blue-100 text-blue-800',
+  admin_support: 'bg-gray-100 text-gray-800',
+};
+
+// ── Default color palette for custom roles ───────────────────────────────────
+
+export const roleColorOptions = [
+  { value: 'bg-emerald-100 text-emerald-800', label: 'Vert', preview: '#10b981' },
+  { value: 'bg-amber-100 text-amber-800', label: 'Ambre', preview: '#f59e0b' },
+  { value: 'bg-rose-100 text-rose-800', label: 'Rose', preview: '#f43f5e' },
+  { value: 'bg-cyan-100 text-cyan-800', label: 'Cyan', preview: '#06b6d4' },
+  { value: 'bg-indigo-100 text-indigo-800', label: 'Indigo', preview: '#6366f1' },
+  { value: 'bg-orange-100 text-orange-800', label: 'Orange', preview: '#f97316' },
+  { value: 'bg-teal-100 text-teal-800', label: 'Sarcelle', preview: '#14b8a6' },
+  { value: 'bg-pink-100 text-pink-800', label: 'Pink', preview: '#ec4899' },
+];
+
 // ── French Labels: Tenant Statuses ────────────────────────────────────────────
 
 export const tenantStatusLabels: Record<string, string> = {

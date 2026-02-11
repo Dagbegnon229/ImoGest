@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { MessageSquare, Send, ArrowLeft, User } from "lucide-react";
+import { MessageSquare, Send, ArrowLeft, User, Loader2, Trash2 } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { Card, Badge, Button, EmptyState } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
+import { uploadMultipleFiles } from "@/lib/supabase";
+import { AttachmentPreview } from "@/components/chat/AttachmentPreview";
+import { FileUploadButton } from "@/components/chat/FileUploadButton";
 import type { Conversation } from "@/types/message";
 
 // ---------------------------------------------------------------------------
@@ -54,6 +57,7 @@ export default function AdminMessagesPage() {
     getTenant,
     getAdmin,
     addMessage,
+    deleteMessage,
     markMessagesRead,
   } = useData();
 
@@ -61,6 +65,9 @@ export default function AdminMessagesPage() {
   const [selectedConvId, setSelectedConvId] = useState<string | null>(null);
   const [messageText, setMessageText] = useState("");
   const [mobileShowChat, setMobileShowChat] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [isSending, setIsSending] = useState(false);
+  const [deletingMsgId, setDeletingMsgId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -116,20 +123,33 @@ export default function AdminMessagesPage() {
 
   const handleSendMessage = useCallback(async () => {
     const trimmed = messageText.trim();
-    if (!trimmed || !selectedConvId || !adminId) return;
+    if ((!trimmed && attachedFiles.length === 0) || !selectedConvId || !adminId) return;
 
+    setIsSending(true);
     try {
+      let attachments: { name: string; url: string; size: number; type: string }[] = [];
+      if (attachedFiles.length > 0) {
+        attachments = await uploadMultipleFiles(
+          "message-attachments",
+          `${selectedConvId}/${adminId}`,
+          attachedFiles,
+        );
+      }
       await addMessage({
         conversationId: selectedConvId,
         senderId: adminId,
         senderType: "admin",
-        content: trimmed,
+        content: trimmed || (attachments.length > 0 ? `📎 ${attachments.length} fichier(s)` : ""),
+        attachments,
       });
       setMessageText("");
+      setAttachedFiles([]);
     } catch {
       showToast("Erreur lors de l'envoi", "error");
+    } finally {
+      setIsSending(false);
     }
-  }, [messageText, selectedConvId, adminId, addMessage, showToast]);
+  }, [messageText, attachedFiles, selectedConvId, adminId, addMessage, showToast]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -144,6 +164,16 @@ export default function AdminMessagesPage() {
   const handleBack = useCallback(() => {
     setMobileShowChat(false);
   }, []);
+
+  const handleDeleteMessage = useCallback(async (msgId: string) => {
+    try {
+      await deleteMessage(msgId);
+      setDeletingMsgId(null);
+      showToast("Message supprimé", "success");
+    } catch {
+      showToast("Erreur lors de la suppression", "error");
+    }
+  }, [deleteMessage, showToast]);
 
   // --- Helpers for rendering -----------------------------------------------
   const getTenantName = useCallback(
@@ -341,13 +371,42 @@ export default function AdminMessagesPage() {
                               </span>
                             </div>
                           )}
-                          <div className={`flex ${isAdmin ? "justify-end" : "justify-start"}`}>
+                          <div className={`flex ${isAdmin ? "justify-end" : "justify-start"} group/msg`}>
                             {/* Client avatar for client messages */}
                             {!isAdmin && (
                               <div className="flex items-end mr-2 mb-1 flex-shrink-0">
                                 <div className="flex items-center justify-center h-7 w-7 rounded-full bg-[#e5e7eb]">
                                   <User className="h-3.5 w-3.5 text-[#6b7280]" />
                                 </div>
+                              </div>
+                            )}
+                            {/* Delete button - left of own messages */}
+                            {isAdmin && (
+                              <div className="flex items-center mr-1.5 opacity-0 group-hover/msg:opacity-100 transition-opacity">
+                                {deletingMsgId === msg.id ? (
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      onClick={() => handleDeleteMessage(msg.id)}
+                                      className="text-[10px] font-medium text-red-600 bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition-colors"
+                                    >
+                                      Confirmer
+                                    </button>
+                                    <button
+                                      onClick={() => setDeletingMsgId(null)}
+                                      className="text-[10px] font-medium text-[#6b7280] hover:text-[#374151] px-1.5 py-1 rounded transition-colors"
+                                    >
+                                      Non
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => setDeletingMsgId(msg.id)}
+                                    className="p-1.5 rounded-lg hover:bg-red-50 text-[#9ca3af] hover:text-red-500 transition-colors"
+                                    title="Supprimer"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </button>
+                                )}
                               </div>
                             )}
                             <div
@@ -362,9 +421,12 @@ export default function AdminMessagesPage() {
                                   {getTenantName(selectedConversation.tenantId)}
                                 </p>
                               )}
-                              <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
-                                {msg.content}
-                              </p>
+                              {msg.content && (
+                                <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
+                                  {msg.content}
+                                </p>
+                              )}
+                              <AttachmentPreview attachments={msg.attachments} isOwn={isAdmin} />
                               <div className="flex items-center justify-end gap-1 mt-1">
                                 <p
                                   className={`text-[10px] ${
@@ -380,6 +442,35 @@ export default function AdminMessagesPage() {
                                 )}
                               </div>
                             </div>
+                            {/* Delete button - right of client messages */}
+                            {!isAdmin && (
+                              <div className="flex items-center ml-1.5 opacity-0 group-hover/msg:opacity-100 transition-opacity">
+                                {deletingMsgId === msg.id ? (
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      onClick={() => handleDeleteMessage(msg.id)}
+                                      className="text-[10px] font-medium text-red-600 bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition-colors"
+                                    >
+                                      Confirmer
+                                    </button>
+                                    <button
+                                      onClick={() => setDeletingMsgId(null)}
+                                      className="text-[10px] font-medium text-[#6b7280] hover:text-[#374151] px-1.5 py-1 rounded transition-colors"
+                                    >
+                                      Non
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => setDeletingMsgId(msg.id)}
+                                    className="p-1.5 rounded-lg hover:bg-red-50 text-[#9ca3af] hover:text-red-500 transition-colors"
+                                    title="Supprimer"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
@@ -391,13 +482,18 @@ export default function AdminMessagesPage() {
 
               {/* Message input */}
               <div className="px-4 py-3 border-t border-[#e5e7eb] bg-white">
+                <FileUploadButton
+                  selectedFiles={attachedFiles}
+                  onFilesSelected={(files) => setAttachedFiles((prev) => [...prev, ...files])}
+                  onRemoveFile={(idx) => setAttachedFiles((prev) => prev.filter((_, i) => i !== idx))}
+                />
                 <div className="flex items-end gap-2">
                   <div className="flex-1">
                     <textarea
                       value={messageText}
                       onChange={(e) => setMessageText(e.target.value)}
                       onKeyDown={handleKeyDown}
-                      placeholder="Tapez votre reponse..."
+                      placeholder="Tapez votre réponse..."
                       rows={1}
                       className="w-full resize-none rounded-lg border border-[#e5e7eb] bg-[#f8fafc] px-4 py-2.5 text-sm text-[#0f1b2d] placeholder:text-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent hover:border-[#6b7280] transition-colors"
                       style={{ maxHeight: "120px" }}
@@ -412,10 +508,10 @@ export default function AdminMessagesPage() {
                     variant="primary"
                     size="sm"
                     onClick={handleSendMessage}
-                    disabled={!messageText.trim()}
+                    disabled={isSending || (!messageText.trim() && attachedFiles.length === 0)}
                     className="h-[42px] w-[42px] !p-0 flex-shrink-0"
                   >
-                    <Send className="h-4 w-4" />
+                    {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   </Button>
                 </div>
               </div>

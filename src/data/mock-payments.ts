@@ -1,7 +1,7 @@
 import type { Payment } from '@/types/payment';
 
 export const mockPayments: Payment[] = [
-  // === CLT-2026-0001 / LSE-001 - Loyer: 6500 MAD ===
+  // === CLT-2026-0001 / LSE-001 - Loyer: 6500 $ ===
   {
     id: 'PAY-001',
     tenantId: 'CLT-2026-0001',
@@ -78,7 +78,7 @@ export const mockPayments: Payment[] = [
     createdAt: '2026-01-25T08:00:00Z',
   },
 
-  // === CLT-2026-0002 / LSE-002 - Loyer: 7200 MAD ===
+  // === CLT-2026-0002 / LSE-002 - Loyer: 7200 $ ===
   {
     id: 'PAY-006',
     tenantId: 'CLT-2026-0002',
@@ -155,7 +155,7 @@ export const mockPayments: Payment[] = [
     createdAt: '2026-01-25T08:00:00Z',
   },
 
-  // === CLT-2026-0003 / LSE-003 - Loyer: 5800 MAD ===
+  // === CLT-2026-0003 / LSE-003 - Loyer: 5800 $ ===
   {
     id: 'PAY-011',
     tenantId: 'CLT-2026-0003',

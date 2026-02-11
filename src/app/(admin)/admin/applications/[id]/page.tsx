@@ -14,7 +14,11 @@ import {
   CheckCircle2,
   XCircle,
   ClipboardList,
+  Download,
+  Image as ImageIcon,
+  ExternalLink,
 } from "lucide-react";
+import { formatFileSize } from "@/lib/utils";
 import {
   applicationStatusLabels,
   applicationStatusColors,
@@ -217,17 +221,42 @@ export default function ApplicationReviewPage() {
           </div>
         }
       >
-        {application.documents.length === 0 ? (
+        {(application.documentFiles?.length ?? 0) === 0 && application.documents.length === 0 ? (
           <p className="text-sm text-[#6b7280]">Aucun document soumis.</p>
+        ) : (application.documentFiles?.length ?? 0) > 0 ? (
+          <ul className="space-y-2">
+            {application.documentFiles.map((doc, idx) => {
+              const isImage = doc.type?.startsWith("image/");
+              return (
+                <li key={idx} className="flex items-center justify-between bg-[#f8fafc] rounded-lg px-3 py-2.5 border border-[#e5e7eb]">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={`flex-shrink-0 rounded-lg p-2 ${isImage ? "bg-blue-50 text-blue-600" : "bg-orange-50 text-orange-600"}`}>
+                      {isImage ? <ImageIcon className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-[#171717] truncate">{doc.name}</p>
+                      <p className="text-xs text-[#6b7280]">{formatFileSize(doc.size)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <a href={doc.url} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg hover:bg-blue-50 text-[#6b7280] hover:text-[#2563eb] transition-colors" title="Ouvrir">
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                    <a href={doc.url} download={doc.name} className="p-1.5 rounded-lg hover:bg-green-50 text-[#6b7280] hover:text-[#10b981] transition-colors" title="Télécharger">
+                      <Download className="h-4 w-4" />
+                    </a>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         ) : (
           <ul className="space-y-2">
             {application.documents.map((doc, idx) => (
-              <li
-                key={idx}
-                className="flex items-center gap-2 text-sm bg-[#f8fafc] rounded-lg px-3 py-2"
-              >
+              <li key={idx} className="flex items-center gap-2 text-sm bg-[#f8fafc] rounded-lg px-3 py-2">
                 <FileText className="h-4 w-4 text-[#6b7280]" />
                 <span className="text-[#171717]">{doc}</span>
+                <span className="text-xs text-[#9ca3af]">(ancien format)</span>
               </li>
             ))}
           </ul>

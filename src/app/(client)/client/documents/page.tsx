@@ -115,9 +115,13 @@ export default function MyDocumentsPage() {
     return counts;
   }, [allDocuments]);
 
-  // Handle simulated download
-  const handleDownload = (title: string) => {
-    showToast(`Téléchargement simulé : ${title}`, "info");
+  // Handle document download
+  const handleDownload = (fileUrl: string, title: string) => {
+    if (fileUrl && fileUrl.startsWith("http")) {
+      window.open(fileUrl, "_blank");
+    } else {
+      showToast(`Document "${title}" — URL non disponible`, "info");
+    }
   };
 
   return (
@@ -235,7 +239,7 @@ export default function MyDocumentsPage() {
               {/* Download button */}
               <div className="mt-4 pt-3 border-t border-[#e5e7eb]">
                 <button
-                  onClick={() => handleDownload(doc.title)}
+                  onClick={() => handleDownload(doc.fileUrl, doc.title)}
                   className="inline-flex items-center gap-2 text-sm font-medium text-[#10b981] hover:text-[#059669] transition-colors"
                 >
                   <Download className="h-4 w-4" />

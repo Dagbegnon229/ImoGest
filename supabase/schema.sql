@@ -12,9 +12,22 @@ CREATE TABLE admins (
   last_name        TEXT NOT NULL,
   email            TEXT NOT NULL UNIQUE,
   phone            TEXT NOT NULL,
-  role             TEXT NOT NULL CHECK (role IN ('super_admin', 'admin_manager', 'admin_support')),
+  role             TEXT NOT NULL,  -- 'super_admin', 'admin_manager', 'admin_support', or any custom role name
   password         TEXT NOT NULL,
   is_active        BOOLEAN NOT NULL DEFAULT true,
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_by       TEXT REFERENCES admins(id)
+);
+
+-- ============================================================
+-- 1b. CUSTOM ROLES
+-- ============================================================
+CREATE TABLE custom_roles (
+  id               TEXT PRIMARY KEY,
+  name             TEXT NOT NULL UNIQUE,
+  label            TEXT NOT NULL,
+  color            TEXT NOT NULL DEFAULT 'bg-gray-100 text-gray-800',
+  description      TEXT DEFAULT '',
   created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
   created_by       TEXT REFERENCES admins(id)
 );
@@ -127,6 +140,7 @@ CREATE TABLE pending_applications (
   password             TEXT NOT NULL,
   housing_preference   TEXT,
   documents            TEXT[] NOT NULL DEFAULT '{}',
+  document_files       JSONB NOT NULL DEFAULT '[]',  -- [{name, url, size, type}]
   status               TEXT NOT NULL CHECK (status IN ('pending_review', 'approved', 'rejected')),
   reviewed_by          TEXT REFERENCES admins(id),
   review_note          TEXT,
@@ -202,6 +216,7 @@ CREATE TABLE messages (
   sender_id        TEXT NOT NULL,
   sender_type      TEXT NOT NULL CHECK (sender_type IN ('admin', 'client')),
   content          TEXT NOT NULL,
+  attachments      JSONB NOT NULL DEFAULT '[]',  -- [{name, url, size, type}]
   read_at          TIMESTAMPTZ,
   created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -225,6 +240,7 @@ CREATE TABLE documents (
 -- ENABLE ROW LEVEL SECURITY ON ALL TABLES
 -- ============================================================
 ALTER TABLE admins               ENABLE ROW LEVEL SECURITY;
+ALTER TABLE custom_roles         ENABLE ROW LEVEL SECURITY;
 ALTER TABLE buildings            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE apartments           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tenants              ENABLE ROW LEVEL SECURITY;
@@ -243,6 +259,7 @@ ALTER TABLE documents            ENABLE ROW LEVEL SECURITY;
 -- (Development only -- tighten for production)
 -- ============================================================
 CREATE POLICY "Allow all for anon" ON admins               FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all for anon" ON custom_roles         FOR ALL TO anon USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all for anon" ON buildings            FOR ALL TO anon USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all for anon" ON apartments           FOR ALL TO anon USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all for anon" ON tenants              FOR ALL TO anon USING (true) WITH CHECK (true);
