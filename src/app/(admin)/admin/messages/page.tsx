@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { Card, Badge, Button, EmptyState } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
+import { adminSuggestedMessages } from "@/lib/constants";
 import { uploadMultipleFiles } from "@/lib/supabase";
 import { AttachmentPreview } from "@/components/chat/AttachmentPreview";
 import { FileUploadButton } from "@/components/chat/FileUploadButton";
@@ -480,8 +481,21 @@ export default function AdminMessagesPage() {
                 )}
               </div>
 
+              {/* Suggested messages */}
+              <div className="px-4 py-2 border-t border-[#e5e7eb] bg-white flex flex-wrap gap-1.5">
+                {adminSuggestedMessages.map((msg, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setMessageText(msg)}
+                    className="text-[11px] px-2.5 py-1 rounded-full border border-[#e5e7eb] text-[#6b7280] hover:bg-[#f0fdf4] hover:text-[#10b981] hover:border-[#10b981] transition-colors"
+                  >
+                    {msg}
+                  </button>
+                ))}
+              </div>
+
               {/* Message input */}
-              <div className="px-4 py-3 border-t border-[#e5e7eb] bg-white">
+              <div className="px-4 py-3 bg-white">
                 <FileUploadButton
                   selectedFiles={attachedFiles}
                   onFilesSelected={(files) => setAttachedFiles((prev) => [...prev, ...files])}

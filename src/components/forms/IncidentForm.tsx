@@ -7,7 +7,7 @@ import type { Incident, IncidentPriority } from "@/types/incident";
 
 interface IncidentFormProps {
   initialData?: Incident;
-  onSubmit: (data: Omit<Incident, "id" | "createdAt">) => void;
+  onSubmit: (data: Omit<Incident, "id" | "createdAt" | "updatedAt">) => void;
   onClose: () => void;
 }
 
@@ -30,7 +30,7 @@ export function IncidentForm({ initialData, onSubmit, onClose }: IncidentFormPro
   const apartmentOptions = buildingId
     ? getApartmentsByBuilding(buildingId).map((a) => ({
         value: a.id,
-        label: `Unit\u00e9 ${a.unitNumber} - \u00c9tage ${a.floor}`,
+        label: `Unité ${a.unitNumber} - Étage ${a.floor}`,
       }))
     : [];
 
@@ -42,7 +42,7 @@ export function IncidentForm({ initialData, onSubmit, onClose }: IncidentFormPro
   ];
 
   const adminOptions = [
-    { value: "", label: "-- Non assign\u00e9 --" },
+    { value: "", label: "-- Non assigné --" },
     ...admins
       .filter((a) => a.isActive)
       .map((a) => ({ value: a.id, label: `${a.firstName} ${a.lastName}` })),
@@ -89,7 +89,7 @@ export function IncidentForm({ initialData, onSubmit, onClose }: IncidentFormPro
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         error={errors.description}
-        placeholder="D\u00e9crivez l'incident en d\u00e9tail..."
+        placeholder="Décrivez l'incident en détail..."
       />
       <div className="grid grid-cols-2 gap-4">
         <Select
@@ -100,7 +100,7 @@ export function IncidentForm({ initialData, onSubmit, onClose }: IncidentFormPro
             setApartmentId("");
           }}
           options={buildingOptions}
-          placeholder="S\u00e9lectionner un immeuble"
+          placeholder="Sélectionner un immeuble"
           error={errors.buildingId}
         />
         <Select
@@ -108,20 +108,20 @@ export function IncidentForm({ initialData, onSubmit, onClose }: IncidentFormPro
           value={apartmentId}
           onChange={(e) => setApartmentId(e.target.value)}
           options={apartmentOptions}
-          placeholder={buildingId ? "S\u00e9lectionner" : "Choisir un immeuble d'abord"}
+          placeholder={buildingId ? "Sélectionner" : "Choisir un immeuble d'abord"}
           disabled={!buildingId}
           error={errors.apartmentId}
         />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <Select
-          label="Priorit\u00e9"
+          label="Priorité"
           value={priority}
           onChange={(e) => setPriority(e.target.value as IncidentPriority)}
           options={priorityOptions}
         />
         <Select
-          label="Assign\u00e9 \u00e0"
+          label="Assigné à"
           value={assignedTo}
           onChange={(e) => setAssignedTo(e.target.value)}
           options={adminOptions}
@@ -132,7 +132,7 @@ export function IncidentForm({ initialData, onSubmit, onClose }: IncidentFormPro
           Annuler
         </Button>
         <Button type="submit">
-          {initialData ? "Mettre \u00e0 jour" : "Cr\u00e9er l'incident"}
+          {initialData ? "Mettre à jour" : "Créer l'incident"}
         </Button>
       </div>
     </form>

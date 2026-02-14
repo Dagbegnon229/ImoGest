@@ -14,6 +14,7 @@ export const mockBuildings: Building[] = [
     yearBuilt: 2010,
     managerId: 'ADM-0010',
     createdAt: '2025-01-15T09:00:00Z',
+    updatedAt: null,
   },
   {
     id: 'BLD-002',
@@ -28,6 +29,7 @@ export const mockBuildings: Building[] = [
     yearBuilt: 2018,
     managerId: 'ADM-0010',
     createdAt: '2025-02-01T10:00:00Z',
+    updatedAt: null,
   },
   {
     id: 'BLD-003',
@@ -42,6 +44,7 @@ export const mockBuildings: Building[] = [
     yearBuilt: 2005,
     managerId: 'ADM-0100',
     createdAt: '2025-02-15T11:00:00Z',
+    updatedAt: null,
   },
   {
     id: 'BLD-004',
@@ -56,6 +59,7 @@ export const mockBuildings: Building[] = [
     yearBuilt: 2000,
     managerId: 'ADM-0100',
     createdAt: '2025-03-01T08:30:00Z',
+    updatedAt: null,
   },
   {
     id: 'BLD-005',
@@ -70,5 +74,6 @@ export const mockBuildings: Building[] = [
     yearBuilt: 2022,
     managerId: 'ADM-0010',
     createdAt: '2025-04-01T09:00:00Z',
+    updatedAt: null,
   },
 ];

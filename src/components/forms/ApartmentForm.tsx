@@ -7,7 +7,7 @@ import type { Apartment, ApartmentStatus } from "@/types/apartment";
 
 interface ApartmentFormProps {
   initialData?: Apartment;
-  onSubmit: (data: Omit<Apartment, "id">) => void;
+  onSubmit: (data: Omit<Apartment, "id" | "updatedAt">) => void;
   onClose: () => void;
 }
 
@@ -30,17 +30,17 @@ export function ApartmentForm({ initialData, onSubmit, onClose }: ApartmentFormP
 
   const statusOptions = [
     { value: "available", label: "Disponible" },
-    { value: "occupied", label: "Occup\u00e9" },
+    { value: "occupied", label: "Occupé" },
     { value: "maintenance", label: "En maintenance" },
-    { value: "reserved", label: "R\u00e9serv\u00e9" },
+    { value: "reserved", label: "Réservé" },
   ];
 
   function validate(): boolean {
     const e: Record<string, string> = {};
     if (!buildingId) e.buildingId = "L'immeuble est requis";
-    if (!unitNumber.trim()) e.unitNumber = "Le num\u00e9ro d'unit\u00e9 est requis";
-    if (!floor || isNaN(Number(floor))) e.floor = "\u00c9tage invalide";
-    if (!rooms || isNaN(Number(rooms)) || Number(rooms) < 1) e.rooms = "Nombre de pi\u00e8ces invalide";
+    if (!unitNumber.trim()) e.unitNumber = "Le numéro d'unité est requis";
+    if (!floor || isNaN(Number(floor))) e.floor = "Étage invalide";
+    if (!rooms || isNaN(Number(rooms)) || Number(rooms) < 1) e.rooms = "Nombre de pièces invalide";
     if (!area || isNaN(Number(area)) || Number(area) <= 0) e.area = "Surface invalide";
     if (!rent || isNaN(Number(rent)) || Number(rent) <= 0) e.rent = "Loyer invalide";
     setErrors(e);
@@ -71,19 +71,19 @@ export function ApartmentForm({ initialData, onSubmit, onClose }: ApartmentFormP
         value={buildingId}
         onChange={(e) => setBuildingId(e.target.value)}
         options={buildingOptions}
-        placeholder="S\u00e9lectionner un immeuble"
+        placeholder="Sélectionner un immeuble"
         error={errors.buildingId}
       />
       <div className="grid grid-cols-2 gap-4">
         <Input
-          label="Num\u00e9ro d'unit\u00e9"
+          label="Numéro d'unité"
           value={unitNumber}
           onChange={(e) => setUnitNumber(e.target.value)}
           error={errors.unitNumber}
           placeholder="101"
         />
         <Input
-          label="\u00c9tage"
+          label="Étage"
           type="number"
           value={floor}
           onChange={(e) => setFloor(e.target.value)}
@@ -93,7 +93,7 @@ export function ApartmentForm({ initialData, onSubmit, onClose }: ApartmentFormP
       </div>
       <div className="grid grid-cols-3 gap-4">
         <Input
-          label="Pi\u00e8ces"
+          label="Pièces"
           type="number"
           value={rooms}
           onChange={(e) => setRooms(e.target.value)}
@@ -101,7 +101,7 @@ export function ApartmentForm({ initialData, onSubmit, onClose }: ApartmentFormP
           min={1}
         />
         <Input
-          label="Surface (m\u00b2)"
+          label="Surface (m²)"
           type="number"
           value={area}
           onChange={(e) => setArea(e.target.value)}
@@ -128,7 +128,7 @@ export function ApartmentForm({ initialData, onSubmit, onClose }: ApartmentFormP
           Annuler
         </Button>
         <Button type="submit">
-          {initialData ? "Mettre \u00e0 jour" : "Cr\u00e9er l'appartement"}
+          {initialData ? "Mettre à jour" : "Créer l'appartement"}
         </Button>
       </div>
     </form>

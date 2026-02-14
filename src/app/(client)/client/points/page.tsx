@@ -162,27 +162,27 @@ function CircularProgress({
 const HOW_TO_EARN = [
   {
     icon: <Zap className="h-5 w-5 text-yellow-500" />,
-    label: "Paiement anticip\u00e9",
+    label: "Paiement anticipé",
     points: 50,
-    description: "Payez avant la date d'\u00e9ch\u00e9ance",
+    description: "Payez avant la date d'échéance",
   },
   {
     icon: <CheckCircle className="h-5 w-5 text-[#10b981]" />,
-    label: "Paiement \u00e0 temps",
+    label: "Paiement à temps",
     points: 30,
-    description: "Payez le jour de l'\u00e9ch\u00e9ance",
+    description: "Payez le jour de l'échéance",
   },
   {
     icon: <Star className="h-5 w-5 text-indigo-500" />,
-    label: "Bonus fid\u00e9lit\u00e9 mensuel",
+    label: "Bonus fidélité mensuel",
     points: 100,
-    description: "R\u00e9compense de fid\u00e9lit\u00e9 chaque mois",
+    description: "Récompense de fidélité chaque mois",
   },
   {
     icon: <ShieldCheck className="h-5 w-5 text-cyan-500" />,
     label: "Aucun incident",
     points: 25,
-    description: "Mois sans aucun incident signal\u00e9",
+    description: "Mois sans aucun incident signalé",
   },
 ];
 

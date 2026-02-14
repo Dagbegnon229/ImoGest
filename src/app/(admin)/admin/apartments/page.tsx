@@ -31,9 +31,9 @@ export default function ApartmentsPage() {
   const statusOptions = [
     { value: "", label: "Tous les statuts" },
     { value: "available", label: "Disponible" },
-    { value: "occupied", label: "Occup\u00e9" },
+    { value: "occupied", label: "Occupé" },
     { value: "maintenance", label: "En maintenance" },
-    { value: "reserved", label: "R\u00e9serv\u00e9" },
+    { value: "reserved", label: "Réservé" },
   ];
 
   const filtered = useMemo(() => {
@@ -64,24 +64,24 @@ export default function ApartmentsPage() {
     return t ? `${t.firstName} ${t.lastName}` : "--";
   }
 
-  async function handleAdd(data: Omit<Apartment, "id">) {
+  async function handleAdd(data: Omit<Apartment, "id" | "updatedAt">) {
     try {
       await addApartment(data);
       setShowModal(false);
-      showToast("Appartement cr\u00e9\u00e9 avec succ\u00e8s", "success");
+      showToast("Appartement créé avec succès", "success");
     } catch {
-      showToast("Erreur lors de l'op\u00e9ration", "error");
+      showToast("Erreur lors de l'opération", "error");
     }
   }
 
-  async function handleEdit(data: Omit<Apartment, "id">) {
+  async function handleEdit(data: Omit<Apartment, "id" | "updatedAt">) {
     if (!editingApt) return;
     try {
       await updateApartment(editingApt.id, data);
       setEditingApt(null);
-      showToast("Appartement modifi\u00e9 avec succ\u00e8s", "success");
+      showToast("Appartement modifié avec succès", "success");
     } catch {
-      showToast("Erreur lors de l'op\u00e9ration", "error");
+      showToast("Erreur lors de l'opération", "error");
     }
   }
 
@@ -99,7 +99,7 @@ export default function ApartmentsPage() {
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
           <div className="flex-1">
             <Input
-              placeholder="Rechercher par unit\u00e9 ou immeuble..."
+              placeholder="Rechercher par unité ou immeuble..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               icon={<Search className="h-4 w-4" />}
@@ -124,7 +124,7 @@ export default function ApartmentsPage() {
         {filtered.length === 0 ? (
           <EmptyState
             icon={<DoorOpen className="h-10 w-10" />}
-            title="Aucun appartement trouv\u00e9"
+            title="Aucun appartement trouvé"
             description="Ajustez vos filtres ou ajoutez un nouvel appartement."
           />
         ) : (

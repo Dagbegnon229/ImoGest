@@ -16,9 +16,9 @@ export default function ApplicationsPage() {
 
   const statusOptions = [
     { value: "", label: "Tous les statuts" },
-    { value: "pending_review", label: "En attente de r\u00e9vision" },
-    { value: "approved", label: "Approuv\u00e9e" },
-    { value: "rejected", label: "Rejet\u00e9e" },
+    { value: "pending_review", label: "En attente de révision" },
+    { value: "approved", label: "Approuvée" },
+    { value: "rejected", label: "Rejetée" },
   ];
 
   const filtered = useMemo(() => {
@@ -62,8 +62,8 @@ export default function ApplicationsPage() {
         {filtered.length === 0 ? (
           <EmptyState
             icon={<ClipboardList className="h-10 w-10" />}
-            title="Aucune demande trouv\u00e9e"
-            description="Aucune demande ne correspond aux filtres s\u00e9lectionn\u00e9s."
+            title="Aucune demande trouvée"
+            description="Aucune demande ne correspond aux filtres sélectionnés."
           />
         ) : (
           <div className="overflow-x-auto">

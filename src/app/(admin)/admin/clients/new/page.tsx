@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useMemo, useCallback, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useData } from "@/contexts/DataContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
@@ -20,6 +20,7 @@ function generatePassword(length = 12): string {
 
 export default function CreateClientPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const { tenants, buildings, getAvailableApartments, addTenant, addLease, updateApartment } =
     useData();
@@ -61,6 +62,22 @@ export default function CreateClientPage() {
 
   const generatedId = useMemo(() => generateTenantId(tenants), [tenants]);
 
+  // Pre-fill building/apartment from URL params (cross-linking)
+  useEffect(() => {
+    const paramBuildingId = searchParams.get("buildingId");
+    const paramApartmentId = searchParams.get("apartmentId");
+    if (paramBuildingId && !buildingId) {
+      setBuildingId(paramBuildingId);
+    }
+    if (paramApartmentId && !apartmentId) {
+      setApartmentId(paramApartmentId);
+      // Auto-fill rent from apartment
+      const apts = getAvailableApartments(paramBuildingId ?? "");
+      const apt = apts.find((a) => a.id === paramApartmentId);
+      if (apt && !rent) setRent(apt.rent.toString());
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const buildingOptions = buildings.map((b) => ({
     value: b.id,
     label: `${b.name} - ${b.city}`,
@@ -73,7 +90,7 @@ export default function CreateClientPage() {
 
   const aptOptions = availableApts.map((a) => ({
     value: a.id,
-    label: `Unit\u00e9 ${a.unitNumber} - \u00c9tage ${a.floor} - ${a.rent} $/mois`,
+    label: `Unité ${a.unitNumber} - Étage ${a.floor} - ${a.rent} $/mois`,
   }));
 
   const selectedPassword = passwordMode === "auto" ? autoPassword : manualPassword;
@@ -86,21 +103,21 @@ export default function CreateClientPage() {
 
   function validate(): boolean {
     const e: Record<string, string> = {};
-    if (!firstName.trim()) e.firstName = "Le pr\u00e9nom est requis";
+    if (!firstName.trim()) e.firstName = "Le prénom est requis";
     if (!lastName.trim()) e.lastName = "Le nom est requis";
     if (!email.trim()) e.email = "L'email est requis";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Email invalide";
-    if (!phone.trim()) e.phone = "Le t\u00e9l\u00e9phone est requis";
+    if (!phone.trim()) e.phone = "Le téléphone est requis";
     if (passwordMode === "manual" && manualPassword.length < 6)
-      e.manualPassword = "Le mot de passe doit contenir au moins 6 caract\u00e8res";
-    if (!buildingId) e.buildingId = "S\u00e9lectionnez un immeuble";
-    if (!apartmentId) e.apartmentId = "S\u00e9lectionnez un appartement";
-    if (!startDate) e.startDate = "La date de d\u00e9but est requise";
+      e.manualPassword = "Le mot de passe doit contenir au moins 6 caractères";
+    if (!buildingId) e.buildingId = "Sélectionnez un immeuble";
+    if (!apartmentId) e.apartmentId = "Sélectionnez un appartement";
+    if (!startDate) e.startDate = "La date de début est requise";
     if (!endDate) e.endDate = "La date de fin est requise";
     if (startDate && endDate && new Date(endDate) <= new Date(startDate))
-      e.endDate = "La date de fin doit \u00eatre apr\u00e8s la date de d\u00e9but";
+      e.endDate = "La date de fin doit être après la date de début";
     if (!rent || isNaN(Number(rent)) || Number(rent) <= 0) e.rent = "Loyer invalide";
-    if (!deposit || isNaN(Number(deposit)) || Number(deposit) < 0) e.deposit = "D\u00e9p\u00f4t invalide";
+    if (!deposit || isNaN(Number(deposit)) || Number(deposit) < 0) e.deposit = "Dépôt invalide";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -125,6 +142,10 @@ export default function CreateClientPage() {
         mustChangePassword: forceChange,
         createdBy: user?.id ?? null,
         statusChangedAt: null,
+        promoCredits: 0,
+        notes: null,
+        emergencyContact: null,
+        emergencyPhone: null,
       });
 
       // 2. Create lease
@@ -161,9 +182,9 @@ export default function CreateClientPage() {
         buildingName: bld?.name ?? "",
       });
 
-      showToast("Client cr\u00e9\u00e9 avec succ\u00e8s", "success");
+      showToast("Client créé avec succès", "success");
     } catch {
-      showToast("Erreur lors de la cr\u00e9ation du client", "error");
+      showToast("Erreur lors de la création du client", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -195,7 +216,7 @@ export default function CreateClientPage() {
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(createdResult.password);
-                      showToast("Mot de passe copi\u00e9", "success");
+                      showToast("Mot de passe copié", "success");
                     }}
                     className="p-1 rounded hover:bg-gray-200"
                   >
@@ -359,7 +380,7 @@ export default function CreateClientPage() {
                 value={manualPassword}
                 onChange={(e) => setManualPassword(e.target.value)}
                 error={errors.manualPassword}
-                placeholder="Minimum 6 caract\u00e8res"
+                placeholder="Minimum 6 caractères"
               />
             )}
 
@@ -386,7 +407,7 @@ export default function CreateClientPage() {
                 setApartmentId("");
               }}
               options={buildingOptions}
-              placeholder="S\u00e9lectionner un immeuble"
+              placeholder="Sélectionner un immeuble"
               error={errors.buildingId}
             />
             <Select
@@ -401,7 +422,7 @@ export default function CreateClientPage() {
               placeholder={
                 buildingId
                   ? availableApts.length > 0
-                    ? "S\u00e9lectionner un appartement"
+                    ? "Sélectionner un appartement"
                     : "Aucun appartement disponible"
                   : "Choisir un immeuble d'abord"
               }
@@ -416,7 +437,7 @@ export default function CreateClientPage() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label="Date de d\u00e9but"
+                label="Date de début"
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
@@ -440,7 +461,7 @@ export default function CreateClientPage() {
                 min={0}
               />
               <Input
-                label="D\u00e9p\u00f4t de garantie ($)"
+                label="Dépôt de garantie ($)"
                 type="number"
                 value={deposit}
                 onChange={(e) => setDeposit(e.target.value)}

@@ -206,6 +206,26 @@ export const pointsTypeLabels: Record<string, string> = {
   bonus: 'Bonus',
 };
 
+// ── Suggested Messages ──────────────────────────────────────────────────────
+
+export const adminSuggestedMessages: string[] = [
+  "Bonjour, comment puis-je vous aider ?",
+  "Votre demande a bien été prise en compte.",
+  "Un technicien passera dans les prochaines 48h.",
+  "Merci de nous avoir contactés.",
+  "Votre paiement a bien été reçu.",
+  "Pourriez-vous fournir plus de détails ?",
+];
+
+export const clientSuggestedMessages: string[] = [
+  "Bonjour, j'ai une question.",
+  "J'ai un problème avec mon appartement.",
+  "Quand est-ce que le technicien passera ?",
+  "Merci pour votre réponse.",
+  "J'ai effectué mon paiement.",
+  "Pouvez-vous m'envoyer un reçu ?",
+];
+
 // ── French Labels: Document Types ────────────────────────────────────────────
 export const documentTypeLabels: Record<string, string> = {
   lease_contract: 'Contrat de bail',

@@ -7,7 +7,7 @@ import type { Building } from "@/types/building";
 
 interface BuildingFormProps {
   initialData?: Building;
-  onSubmit: (data: Omit<Building, "id" | "createdAt">) => void;
+  onSubmit: (data: Omit<Building, "id" | "createdAt" | "updatedAt">) => void;
   onClose: () => void;
 }
 
@@ -40,11 +40,11 @@ export function BuildingForm({ initialData, onSubmit, onClose }: BuildingFormPro
     if (!province.trim()) e.province = "La province est requise";
     if (!postalCode.trim()) e.postalCode = "Le code postal est requis";
     if (!floors || isNaN(Number(floors)) || Number(floors) < 1)
-      e.floors = "Nombre d'\u00e9tages invalide";
+      e.floors = "Nombre d'étages invalide";
     if (!totalUnits || isNaN(Number(totalUnits)) || Number(totalUnits) < 1)
-      e.totalUnits = "Nombre d'unit\u00e9s invalide";
+      e.totalUnits = "Nombre d'unités invalide";
     if (!yearBuilt || isNaN(Number(yearBuilt)) || Number(yearBuilt) < 1800)
-      e.yearBuilt = "Ann\u00e9e de construction invalide";
+      e.yearBuilt = "Année de construction invalide";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -74,7 +74,7 @@ export function BuildingForm({ initialData, onSubmit, onClose }: BuildingFormPro
         value={name}
         onChange={(e) => setName(e.target.value)}
         error={errors.name}
-        placeholder="R\u00e9sidence du Parc"
+        placeholder="Résidence du Parc"
       />
       <Input
         label="Adresse"
@@ -89,7 +89,7 @@ export function BuildingForm({ initialData, onSubmit, onClose }: BuildingFormPro
           value={city}
           onChange={(e) => setCity(e.target.value)}
           error={errors.city}
-          placeholder="Montr\u00e9al"
+          placeholder="Montréal"
         />
         <Input
           label="Province"
@@ -108,7 +108,7 @@ export function BuildingForm({ initialData, onSubmit, onClose }: BuildingFormPro
       />
       <div className="grid grid-cols-3 gap-4">
         <Input
-          label="\u00c9tages"
+          label="Étages"
           type="number"
           value={floors}
           onChange={(e) => setFloors(e.target.value)}
@@ -116,7 +116,7 @@ export function BuildingForm({ initialData, onSubmit, onClose }: BuildingFormPro
           min={1}
         />
         <Input
-          label="Unit\u00e9s totales"
+          label="Unités totales"
           type="number"
           value={totalUnits}
           onChange={(e) => setTotalUnits(e.target.value)}
@@ -124,7 +124,7 @@ export function BuildingForm({ initialData, onSubmit, onClose }: BuildingFormPro
           min={1}
         />
         <Input
-          label="Ann\u00e9e de construction"
+          label="Année de construction"
           type="number"
           value={yearBuilt}
           onChange={(e) => setYearBuilt(e.target.value)}
@@ -144,7 +144,7 @@ export function BuildingForm({ initialData, onSubmit, onClose }: BuildingFormPro
           Annuler
         </Button>
         <Button type="submit">
-          {initialData ? "Mettre \u00e0 jour" : "Cr\u00e9er l'immeuble"}
+          {initialData ? "Mettre à jour" : "Créer l'immeuble"}
         </Button>
       </div>
     </form>

@@ -21,6 +21,7 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  UserPlus,
 } from "lucide-react";
 import {
   apartmentStatusLabels,
@@ -88,7 +89,7 @@ export default function ApartmentDetailPage() {
         <EmptyState
           icon={<DoorOpen className="h-10 w-10" />}
           title="Appartement introuvable"
-          description="L'appartement demand\u00e9 n'existe pas."
+          description="L'appartement demandé n'existe pas."
         />
       </div>
     );
@@ -96,18 +97,18 @@ export default function ApartmentDetailPage() {
 
   const statusOptions = [
     { value: "available", label: "Disponible" },
-    { value: "occupied", label: "Occup\u00e9" },
+    { value: "occupied", label: "Occupé" },
     { value: "maintenance", label: "En maintenance" },
-    { value: "reserved", label: "R\u00e9serv\u00e9" },
+    { value: "reserved", label: "Réservé" },
   ];
 
-  async function handleEditSubmit(data: Omit<Apartment, "id">) {
+  async function handleEditSubmit(data: Omit<Apartment, "id" | "updatedAt">) {
     try {
       await updateApartment(aptId, data);
       setShowEditModal(false);
-      showToast("Appartement modifi\u00e9 avec succ\u00e8s", "success");
+      showToast("Appartement modifié avec succès", "success");
     } catch {
-      showToast("Erreur lors de l'op\u00e9ration", "error");
+      showToast("Erreur lors de l'opération", "error");
     }
   }
 
@@ -194,6 +195,20 @@ export default function ApartmentDetailPage() {
           >
             Changer statut
           </Button>
+          {apartment.status === "available" && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                router.push(
+                  `/admin/clients/new?buildingId=${apartment.buildingId}&apartmentId=${apartment.id}`
+                )
+              }
+            >
+              <UserPlus className="h-4 w-4" />
+              Assigner un client
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={() => setShowEditModal(true)}>
             <Pencil className="h-4 w-4" />
             Modifier

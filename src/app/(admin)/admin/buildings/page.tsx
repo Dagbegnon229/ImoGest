@@ -34,24 +34,24 @@ export default function BuildingsPage() {
     return { occupied, total: apts.length };
   }
 
-  async function handleAdd(data: Omit<Building, "id" | "createdAt">) {
+  async function handleAdd(data: Omit<Building, "id" | "createdAt" | "updatedAt">) {
     try {
       await addBuilding(data);
       setShowModal(false);
-      showToast("Immeuble cr\u00e9\u00e9 avec succ\u00e8s", "success");
+      showToast("Immeuble créé avec succès", "success");
     } catch {
-      showToast("Erreur lors de l'op\u00e9ration", "error");
+      showToast("Erreur lors de l'opération", "error");
     }
   }
 
-  async function handleEdit(data: Omit<Building, "id" | "createdAt">) {
+  async function handleEdit(data: Omit<Building, "id" | "createdAt" | "updatedAt">) {
     if (!editingBuilding) return;
     try {
       await updateBuilding(editingBuilding.id, data);
       setEditingBuilding(null);
-      showToast("Immeuble modifi\u00e9 avec succ\u00e8s", "success");
+      showToast("Immeuble modifié avec succès", "success");
     } catch {
-      showToast("Erreur lors de l'op\u00e9ration", "error");
+      showToast("Erreur lors de l'opération", "error");
     }
   }
 
@@ -63,9 +63,9 @@ export default function BuildingsPage() {
     }
     try {
       await deleteBuilding(id);
-      showToast("Immeuble supprim\u00e9 avec succ\u00e8s", "success");
+      showToast("Immeuble supprimé avec succès", "success");
     } catch {
-      showToast("Erreur lors de l'op\u00e9ration", "error");
+      showToast("Erreur lors de l'opération", "error");
     }
   }
 
@@ -92,10 +92,10 @@ export default function BuildingsPage() {
         {filtered.length === 0 ? (
           <EmptyState
             icon={<Building2 className="h-10 w-10" />}
-            title="Aucun immeuble trouv\u00e9"
+            title="Aucun immeuble trouvé"
             description={
               search
-                ? "Aucun r\u00e9sultat pour votre recherche."
+                ? "Aucun résultat pour votre recherche."
                 : "Commencez par ajouter votre premier immeuble."
             }
             action={

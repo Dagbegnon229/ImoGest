@@ -7,11 +7,15 @@ import {
   AlertTriangle,
   TrendingUp,
   Clock,
-  DollarSign,
   Eye,
+  CheckCircle2,
+  XCircle,
+  ImageIcon,
 } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
-import { Card, Badge, EmptyState, StatsCard, Modal, Input, Select } from "@/components/ui";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
+import { Card, Badge, Button, EmptyState, StatsCard, Modal, Input, Select } from "@/components/ui";
 import { formatDate, formatCurrency } from "@/lib/utils";
 import {
   paymentStatusLabels,
@@ -34,12 +38,14 @@ function formatMonth(month: string): string {
   }
 }
 
-/** Check whether a payment is overdue: pending + dueDate in the past */
+/** Check whether a payment is overdue: pending + past the 7th of the payment month */
 function isOverdue(payment: Payment): boolean {
   if (payment.status !== "pending") return false;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const due = new Date(payment.dueDate);
+  // Due date is always the 7th of the payment month
+  const [year, month] = payment.month.split("-");
+  const due = new Date(Number(year), Number(month) - 1, 7);
   due.setHours(0, 0, 0, 0);
   return due < today;
 }
@@ -60,12 +66,73 @@ const statusBadgeVariant: Record<string, "default" | "success" | "warning" | "da
 // ---------------------------------------------------------------------------
 
 export default function PaymentsPage() {
-  const { payments, tenants, getTenant, buildings, getBuilding } = useData();
+  const { payments, tenants, getTenant, buildings, getBuilding, updatePayment, addPointsTransaction } = useData();
+  const { user } = useAuth();
+  const { showToast } = useToast();
+  const isSuperAdmin = user?.role === "super_admin";
 
   // State
   const [filterStatus, setFilterStatus] = useState("");
   const [search, setSearch] = useState("");
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
+  const [showProofImage, setShowProofImage] = useState(false);
+
+  // ---------- Payment validation handlers ------------------------------------
+
+  async function handleValidatePayment() {
+    if (!selectedPayment) return;
+    setIsValidating(true);
+    try {
+      await updatePayment(selectedPayment.id, {
+        status: "completed",
+        paidAt: new Date().toISOString(),
+      });
+
+      // Award loyalty points
+      const paidOverdue = isOverdue(selectedPayment);
+      const pointsType = paidOverdue ? "earned_on_time" : "earned_early_payment";
+      const pointsAmount = paidOverdue ? 5 : 10;
+      try {
+        await addPointsTransaction({
+          tenantId: selectedPayment.tenantId,
+          type: pointsType,
+          points: pointsAmount,
+          description: paidOverdue
+            ? `Paiement ${formatMonth(selectedPayment.month)}`
+            : `Paiement anticipé ${formatMonth(selectedPayment.month)}`,
+          relatedPaymentId: selectedPayment.id,
+        });
+      } catch {
+        // Points attribution failure is non-blocking
+      }
+
+      showToast("Paiement validé avec succès", "success");
+      setSelectedPayment(null);
+    } catch {
+      showToast("Erreur lors de la validation", "error");
+    } finally {
+      setIsValidating(false);
+    }
+  }
+
+  async function handleRefusePayment() {
+    if (!selectedPayment) return;
+    setIsValidating(true);
+    try {
+      await updatePayment(selectedPayment.id, {
+        status: "failed",
+        reference: null,
+        proofImageUrl: null,
+      });
+      showToast("Paiement refusé", "success");
+      setSelectedPayment(null);
+    } catch {
+      showToast("Erreur lors du refus", "error");
+    } finally {
+      setIsValidating(false);
+    }
+  }
 
   // ---------- Stats --------------------------------------------------------
 
@@ -75,13 +142,11 @@ export default function PaymentsPage() {
     const overduePayments = payments.filter((p) => isOverdue(p));
 
     const totalRevenue = completedPayments.reduce((sum, p) => sum + p.amount, 0);
-    const totalLateFees = completedPayments.reduce((sum, p) => sum + p.lateFee, 0);
 
     return {
       totalRevenue,
       pendingCount: pendingPayments.length,
       overdueCount: overduePayments.length,
-      totalLateFees,
     };
   }, [payments]);
 
@@ -128,8 +193,8 @@ export default function PaymentsPage() {
   const statusOptions = [
     { value: "", label: "Tous les statuts" },
     { value: "pending", label: "En attente" },
-    { value: "completed", label: "Pay\u00e9" },
-    { value: "failed", label: "\u00c9chou\u00e9" },
+    { value: "completed", label: "Payé" },
+    { value: "failed", label: "Échoué" },
   ];
 
   // ---------- Modal detail -------------------------------------------------
@@ -150,12 +215,14 @@ export default function PaymentsPage() {
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard
-          label="Total revenus"
-          value={formatCurrency(stats.totalRevenue)}
-          icon={<TrendingUp className="h-5 w-5" />}
-        />
+      <div className={`grid grid-cols-1 ${isSuperAdmin ? "sm:grid-cols-3" : "sm:grid-cols-2"} gap-4`}>
+        {isSuperAdmin && (
+          <StatsCard
+            label="Total revenus"
+            value={formatCurrency(stats.totalRevenue)}
+            icon={<TrendingUp className="h-5 w-5" />}
+          />
+        )}
         <StatsCard
           label="En attente"
           value={stats.pendingCount}
@@ -165,11 +232,6 @@ export default function PaymentsPage() {
           label="Paiements en retard"
           value={stats.overdueCount}
           icon={<AlertTriangle className="h-5 w-5" />}
-        />
-        <StatsCard
-          label="Frais de retard collect\u00e9s"
-          value={formatCurrency(stats.totalLateFees)}
-          icon={<DollarSign className="h-5 w-5" />}
         />
       </div>
 
@@ -196,7 +258,7 @@ export default function PaymentsPage() {
         {filtered.length === 0 ? (
           <EmptyState
             icon={<CreditCard className="h-10 w-10" />}
-            title="Aucun paiement trouv\u00e9"
+            title="Aucun paiement trouvé"
             description="Ajustez vos filtres ou attendez de nouveaux paiements."
           />
         ) : (
@@ -217,10 +279,10 @@ export default function PaymentsPage() {
                     Montant
                   </th>
                   <th className="px-4 py-3 text-left font-medium text-[#6b7280]">
-                    \u00c9ch\u00e9ance
+                    Échéance
                   </th>
                   <th className="px-4 py-3 text-left font-medium text-[#6b7280]">
-                    Pay\u00e9 le
+                    Payé le
                   </th>
                   <th className="px-4 py-3 text-left font-medium text-[#6b7280]">
                     Statut
@@ -275,7 +337,7 @@ export default function PaymentsPage() {
                             setSelectedPayment(payment);
                           }}
                           className="rounded-lg p-1.5 text-[#6b7280] hover:bg-gray-100 hover:text-[#171717] transition-colors inline-flex"
-                          title="Voir d\u00e9tails"
+                          title="Voir détails"
                         >
                           <Eye className="h-4 w-4" />
                         </button>
@@ -293,7 +355,7 @@ export default function PaymentsPage() {
       <Modal
         isOpen={!!selectedPayment}
         onClose={() => setSelectedPayment(null)}
-        title="D\u00e9tails du paiement"
+        title="Détails du paiement"
         size="lg"
       >
         {selectedPayment && (
@@ -336,15 +398,11 @@ export default function PaymentsPage() {
                 value={formatCurrency(selectedPayment.monthlyRent)}
               />
               <DetailItem
-                label="Montant pay\u00e9"
+                label="Montant payé"
                 value={formatCurrency(selectedPayment.amount)}
               />
               <DetailItem
-                label="Frais de retard"
-                value={formatCurrency(selectedPayment.lateFee)}
-              />
-              <DetailItem
-                label="\u00c9ch\u00e9ance"
+                label="Échéance"
                 value={formatDate(selectedPayment.dueDate)}
               />
               <DetailItem
@@ -352,7 +410,7 @@ export default function PaymentsPage() {
                 value={selectedPayment.paidAt ? formatDate(selectedPayment.paidAt) : "--"}
               />
               <DetailItem
-                label="M\u00e9thode"
+                label="Méthode"
                 value={
                   selectedPayment.method
                     ? paymentMethodLabels[selectedPayment.method] ?? selectedPayment.method
@@ -360,18 +418,71 @@ export default function PaymentsPage() {
                 }
               />
               <DetailItem
-                label="R\u00e9f\u00e9rence"
+                label="Référence"
                 value={selectedPayment.reference ?? "--"}
               />
             </div>
 
+            {/* Proof image */}
+            {selectedPayment.proofImageUrl && (
+              <div className="border-t border-[#e5e7eb] pt-4">
+                <p className="text-xs font-medium text-[#6b7280] mb-2">Preuve de paiement</p>
+                <img
+                  src={selectedPayment.proofImageUrl}
+                  alt="Preuve de paiement"
+                  className="rounded-lg border border-[#e5e7eb] max-h-48 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => setShowProofImage(true)}
+                />
+              </div>
+            )}
+
             {/* Created at */}
             <p className="text-xs text-[#6b7280] pt-2 border-t border-[#e5e7eb]">
-              Cr\u00e9\u00e9 le {formatDate(selectedPayment.createdAt)}
+              Créé le {formatDate(selectedPayment.createdAt)}
             </p>
+
+            {/* Validate / Refuse buttons for pending payments */}
+            {selectedPayment.status === "pending" && selectedPayment.reference && (
+              <div className="flex gap-3 pt-3 border-t border-[#e5e7eb]">
+                <Button
+                  variant="outline"
+                  className="flex-1 gap-2 text-red-600 border-red-200 hover:bg-red-50"
+                  onClick={handleRefusePayment}
+                  disabled={isValidating}
+                >
+                  <XCircle className="h-4 w-4" />
+                  Refuser
+                </Button>
+                <Button
+                  variant="primary"
+                  className="flex-1 gap-2"
+                  onClick={handleValidatePayment}
+                  isLoading={isValidating}
+                >
+                  <CheckCircle2 className="h-4 w-4" />
+                  Valider le paiement
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </Modal>
+
+      {/* Proof image fullscreen modal */}
+      {selectedPayment?.proofImageUrl && (
+        <Modal
+          isOpen={showProofImage}
+          onClose={() => setShowProofImage(false)}
+          title="Preuve de paiement"
+          size="lg"
+        >
+          <img
+            src={selectedPayment.proofImageUrl}
+            alt="Preuve de paiement"
+            className="w-full rounded-lg"
+          />
+        </Modal>
+      )}
     </div>
   );
 }

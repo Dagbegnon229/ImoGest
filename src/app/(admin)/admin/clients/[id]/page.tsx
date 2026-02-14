@@ -18,6 +18,11 @@ import {
   CheckCircle2,
   Trash2,
   Clock,
+  Gift,
+  Plus,
+  StickyNote,
+  Phone,
+  Save,
 } from "lucide-react";
 import { getTimeAgo } from "@/lib/utils";
 import {
@@ -50,6 +55,11 @@ export default function ClientDetailPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [addingCredits, setAddingCredits] = useState(false);
+  const [notesValue, setNotesValue] = useState(tenant?.notes ?? "");
+  const [emergencyContactValue, setEmergencyContactValue] = useState(tenant?.emergencyContact ?? "");
+  const [emergencyPhoneValue, setEmergencyPhoneValue] = useState(tenant?.emergencyPhone ?? "");
+  const [savingInfo, setSavingInfo] = useState(false);
 
   const building = tenant?.buildingId ? getBuilding(tenant.buildingId) : undefined;
   const apartment = tenant?.apartmentId ? getApartment(tenant.apartmentId) : undefined;
@@ -75,7 +85,7 @@ export default function ClientDetailPage() {
         <EmptyState
           icon={<User className="h-10 w-10" />}
           title="Client introuvable"
-          description="Le client demand\u00e9 n'existe pas."
+          description="Le client demandé n'existe pas."
         />
       </div>
     );
@@ -90,27 +100,59 @@ export default function ClientDetailPage() {
     try {
       await updateTenant(tenantId, data);
       setShowEditModal(false);
-      showToast("Client modifi\u00e9 avec succ\u00e8s", "success");
+      showToast("Client modifié avec succès", "success");
     } catch {
-      showToast("Erreur lors de l'op\u00e9ration", "error");
+      showToast("Erreur lors de l'opération", "error");
     }
   }
 
   async function handleSuspend() {
     try {
       await updateTenant(tenantId, { status: "suspended" });
-      showToast("Client suspendu avec succ\u00e8s", "success");
+      showToast("Client suspendu avec succès", "success");
     } catch {
-      showToast("Erreur lors de l'op\u00e9ration", "error");
+      showToast("Erreur lors de l'opération", "error");
     }
   }
 
   async function handleReactivate() {
     try {
       await updateTenant(tenantId, { status: "active" });
-      showToast("Client r\u00e9activ\u00e9 avec succ\u00e8s", "success");
+      showToast("Client réactivé avec succès", "success");
     } catch {
-      showToast("Erreur lors de l'op\u00e9ration", "error");
+      showToast("Erreur lors de l'opération", "error");
+    }
+  }
+
+  async function handleAddCredits() {
+    if (!tenant) return;
+    setAddingCredits(true);
+    try {
+      await updateTenant(tenantId, {
+        promoCredits: (tenant.promoCredits ?? 0) + 200,
+      });
+      showToast("200 $ de crédits promo ajoutés", "success");
+    } catch {
+      showToast("Erreur lors de l'ajout des crédits", "error");
+    } finally {
+      setAddingCredits(false);
+    }
+  }
+
+  async function handleSaveExtraInfo() {
+    if (!tenant) return;
+    setSavingInfo(true);
+    try {
+      await updateTenant(tenantId, {
+        notes: notesValue.trim() || null,
+        emergencyContact: emergencyContactValue.trim() || null,
+        emergencyPhone: emergencyPhoneValue.trim() || null,
+      });
+      showToast("Informations mises à jour", "success");
+    } catch {
+      showToast("Erreur lors de la sauvegarde", "error");
+    } finally {
+      setSavingInfo(false);
     }
   }
 
@@ -118,7 +160,7 @@ export default function ClientDetailPage() {
     try {
       setDeleting(true);
       await deleteTenant(tenantId);
-      showToast("Client supprim\u00e9 avec succ\u00e8s", "success");
+      showToast("Client supprimé avec succès", "success");
       router.push("/admin/clients");
     } catch {
       showToast("Erreur lors de la suppression", "error");
@@ -319,12 +361,102 @@ export default function ClientDetailPage() {
         </Card>
       )}
 
+      {/* Crédits Promo */}
+      <Card
+        header={
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Gift className="h-4 w-4 text-[#10b981]" />
+              <h2 className="font-semibold text-[#171717]">Crédits Promo</h2>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1"
+              onClick={handleAddCredits}
+              disabled={addingCredits}
+            >
+              <Plus className="h-3.5 w-3.5" />
+              +200 $
+            </Button>
+          </div>
+        }
+      >
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-[#6b7280]">Solde actuel</p>
+          <p className={`text-2xl font-bold ${(tenant.promoCredits ?? 0) > 0 ? "text-[#10b981]" : "text-[#171717]"}`}>
+            {tenant.promoCredits ?? 0} $ CAD
+          </p>
+        </div>
+      </Card>
+
+      {/* Informations supplémentaires */}
+      <Card
+        header={
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <StickyNote className="h-4 w-4 text-[#6b7280]" />
+              <h2 className="font-semibold text-[#171717]">Informations supplémentaires</h2>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1"
+              onClick={handleSaveExtraInfo}
+              disabled={savingInfo}
+            >
+              <Save className="h-3.5 w-3.5" />
+              Enregistrer
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-[#374151] mb-1">Notes internes</label>
+            <textarea
+              value={notesValue}
+              onChange={(e) => setNotesValue(e.target.value)}
+              placeholder="Notes internes sur ce client..."
+              rows={3}
+              className="w-full rounded-lg border border-[#e5e7eb] bg-[#f8fafc] px-3 py-2 text-sm text-[#0f1b2d] placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent"
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-[#374151] mb-1">
+                <span className="flex items-center gap-1.5"><User className="h-3.5 w-3.5" /> Contact d'urgence</span>
+              </label>
+              <input
+                type="text"
+                value={emergencyContactValue}
+                onChange={(e) => setEmergencyContactValue(e.target.value)}
+                placeholder="Nom du contact d'urgence"
+                className="w-full rounded-lg border border-[#e5e7eb] bg-[#f8fafc] px-3 py-2 text-sm text-[#0f1b2d] placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#374151] mb-1">
+                <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> Téléphone d'urgence</span>
+              </label>
+              <input
+                type="tel"
+                value={emergencyPhoneValue}
+                onChange={(e) => setEmergencyPhoneValue(e.target.value)}
+                placeholder="514-000-0000"
+                className="w-full rounded-lg border border-[#e5e7eb] bg-[#f8fafc] px-3 py-2 text-sm text-[#0f1b2d] placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent"
+              />
+            </div>
+          </div>
+        </div>
+      </Card>
+
       {/* Incidents */}
       <Card
         header={
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-[#6b7280]" />
-            <h2 className="font-semibold text-[#171717]">Incidents signal&eacute;s</h2>
+            <h2 className="font-semibold text-[#171717]">Incidents signalés</h2>
           </div>
         }
         padding={false}
@@ -444,7 +576,7 @@ export default function ClientDetailPage() {
               disabled={deleting}
             >
               <Trash2 className="h-4 w-4" />
-              {deleting ? "Suppression..." : "Supprimer d\u00e9finitivement"}
+              {deleting ? "Suppression..." : "Supprimer définitivement"}
             </Button>
           </div>
         </div>

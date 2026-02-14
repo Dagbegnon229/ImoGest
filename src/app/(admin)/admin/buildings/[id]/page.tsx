@@ -15,6 +15,7 @@ import {
   Wrench,
   Pencil,
   AlertTriangle,
+  UserPlus,
 } from "lucide-react";
 import {
   apartmentStatusLabels,
@@ -78,13 +79,13 @@ export default function BuildingDetailPage() {
     );
   }
 
-  async function handleUpdate(data: Omit<Building, "id" | "createdAt">) {
+  async function handleUpdate(data: Omit<Building, "id" | "createdAt" | "updatedAt">) {
     try {
       await updateBuilding(buildingId, data);
       setShowEditModal(false);
-      showToast("Immeuble modifi\u00e9 avec succ\u00e8s", "success");
+      showToast("Immeuble modifié avec succès", "success");
     } catch {
-      showToast("Erreur lors de l'op\u00e9ration", "error");
+      showToast("Erreur lors de l'opération", "error");
     }
   }
 
@@ -107,10 +108,21 @@ export default function BuildingDetailPage() {
             {building.address}, {building.city}, {building.province} {building.postalCode}
           </p>
         </div>
-        <Button variant="outline" onClick={() => setShowEditModal(true)}>
-          <Pencil className="h-4 w-4" />
-          Modifier
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() =>
+              router.push(`/admin/clients/new?buildingId=${building.id}`)
+            }
+          >
+            <UserPlus className="h-4 w-4" />
+            Ajouter un client
+          </Button>
+          <Button variant="outline" onClick={() => setShowEditModal(true)}>
+            <Pencil className="h-4 w-4" />
+            Modifier
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}

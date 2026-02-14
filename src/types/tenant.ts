@@ -15,4 +15,9 @@ export interface Tenant {
   createdAt: string;
   createdBy: string | null;
   statusChangedAt: string | null;
+  updatedAt: string | null;
+  promoCredits: number;
+  notes: string | null;
+  emergencyContact: string | null;
+  emergencyPhone: string | null;
 }

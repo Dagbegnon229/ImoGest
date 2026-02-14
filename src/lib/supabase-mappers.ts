@@ -66,6 +66,7 @@ export function toBuilding(row: any): Building {
     yearBuilt: row.year_built,
     managerId: row.manager_id,
     createdAt: row.created_at,
+    updatedAt: row.updated_at ?? null,
   };
 }
 
@@ -83,6 +84,7 @@ export function fromBuilding(building: Building): any {
     year_built: building.yearBuilt,
     manager_id: building.managerId,
     created_at: building.createdAt,
+    updated_at: building.updatedAt,
   };
 }
 
@@ -102,6 +104,7 @@ export function toApartment(row: any): Apartment {
     status: row.status,
     tenantId: row.tenant_id,
     images: row.images ?? [],
+    updatedAt: row.updated_at ?? null,
   };
 }
 
@@ -117,6 +120,7 @@ export function fromApartment(apartment: Apartment): any {
     status: apartment.status,
     tenant_id: apartment.tenantId,
     images: apartment.images ?? [],
+    updated_at: apartment.updatedAt,
   };
 }
 
@@ -140,6 +144,11 @@ export function toTenant(row: any): Tenant {
     createdAt: row.created_at,
     createdBy: row.created_by,
     statusChangedAt: row.status_changed_at,
+    updatedAt: row.updated_at ?? null,
+    promoCredits: row.promo_credits ?? 0,
+    notes: row.notes ?? null,
+    emergencyContact: row.emergency_contact ?? null,
+    emergencyPhone: row.emergency_phone ?? null,
   };
 }
 
@@ -159,6 +168,11 @@ export function fromTenant(tenant: Tenant): any {
     created_at: tenant.createdAt,
     created_by: tenant.createdBy,
     status_changed_at: tenant.statusChangedAt,
+    updated_at: tenant.updatedAt,
+    promo_credits: tenant.promoCredits,
+    notes: tenant.notes,
+    emergency_contact: tenant.emergencyContact,
+    emergency_phone: tenant.emergencyPhone,
   };
 }
 
@@ -179,6 +193,7 @@ export function toLease(row: any): Lease {
     status: row.status,
     createdAt: row.created_at,
     createdBy: row.created_by,
+    updatedAt: row.updated_at ?? null,
   };
 }
 
@@ -195,6 +210,7 @@ export function fromLease(lease: Lease): any {
     status: lease.status,
     created_at: lease.createdAt,
     created_by: lease.createdBy,
+    updated_at: lease.updatedAt,
   };
 }
 
@@ -215,6 +231,7 @@ export function toIncident(row: any): Incident {
     priority: row.priority,
     createdAt: row.created_at,
     resolvedAt: row.resolved_at,
+    updatedAt: row.updated_at ?? null,
   };
 }
 
@@ -231,6 +248,7 @@ export function fromIncident(incident: Incident): any {
     priority: incident.priority,
     created_at: incident.createdAt,
     resolved_at: incident.resolvedAt,
+    updated_at: incident.updatedAt,
   };
 }
 
@@ -294,7 +312,9 @@ export function toPayment(row: any): Payment {
     method: row.method,
     reference: row.reference,
     lateFee: row.late_fee,
+    proofImageUrl: row.proof_image_url ?? null,
     createdAt: row.created_at,
+    updatedAt: row.updated_at ?? null,
   };
 }
 
@@ -312,7 +332,9 @@ export function fromPayment(payment: Payment): any {
     method: payment.method,
     reference: payment.reference,
     late_fee: payment.lateFee,
+    proof_image_url: payment.proofImageUrl,
     created_at: payment.createdAt,
+    updated_at: payment.updatedAt,
   };
 }
 

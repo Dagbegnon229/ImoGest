@@ -236,6 +236,20 @@ export function formatFileSize(bytes: number): string {
  * Returns a human-readable relative time string in French.
  * Example: "il y a 3 jours", "il y a 2 mois", "il y a 1 an"
  */
+/**
+ * Format a date as "dd/mm/yyyy à HH:mm" in French locale.
+ */
+export function formatDateTime(dateString: string | null | undefined): string {
+  if (!dateString) return '';
+  try {
+    const d = new Date(dateString);
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+      + ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return '';
+  }
+}
+
 export function getTimeAgo(dateString: string | null | undefined): string {
   if (!dateString) return "";
   try {

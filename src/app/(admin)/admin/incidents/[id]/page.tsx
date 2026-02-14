@@ -55,7 +55,7 @@ export default function IncidentDetailPage() {
         <EmptyState
           icon={<AlertTriangle className="h-10 w-10" />}
           title="Incident introuvable"
-          description="L'incident demand\u00e9 n'existe pas."
+          description="L'incident demandé n'existe pas."
         />
       </div>
     );
@@ -76,8 +76,8 @@ export default function IncidentDetailPage() {
   const statusOptions = [
     { value: "new", label: "Nouveau" },
     { value: "in_progress", label: "En cours" },
-    { value: "resolved", label: "R\u00e9solu" },
-    { value: "closed", label: "Ferm\u00e9" },
+    { value: "resolved", label: "Résolu" },
+    { value: "closed", label: "Fermé" },
   ];
 
   const priorityOptions = [
@@ -88,7 +88,7 @@ export default function IncidentDetailPage() {
   ];
 
   const adminOptions = [
-    { value: "", label: "-- Non assign\u00e9 --" },
+    { value: "", label: "-- Non assigné --" },
     ...admins
       .filter((a) => a.isActive)
       .map((a) => ({ value: a.id, label: `${a.firstName} ${a.lastName}` })),
@@ -107,9 +107,9 @@ export default function IncidentDetailPage() {
 
     try {
       await updateIncident(incidentId, updates);
-      showToast("Incident modifi\u00e9 avec succ\u00e8s", "success");
+      showToast("Incident modifié avec succès", "success");
     } catch {
-      showToast("Erreur lors de l'op\u00e9ration", "error");
+      showToast("Erreur lors de l'opération", "error");
     }
   }
 
@@ -228,7 +228,7 @@ export default function IncidentDetailPage() {
               <dd className="font-medium text-[#171717]">
                 {assignedAdmin
                   ? `${assignedAdmin.firstName} ${assignedAdmin.lastName}`
-                  : "Non assign\u00e9"}
+                  : "Non assigné"}
               </dd>
             </div>
           </dl>
@@ -265,7 +265,7 @@ export default function IncidentDetailPage() {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}`
-                : "Non r\u00e9solu"}
+                : "Non résolu"}
             </dd>
           </div>
         </dl>

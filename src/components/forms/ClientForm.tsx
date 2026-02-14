@@ -25,12 +25,12 @@ export function ClientForm({ initialData, onSubmit, onClose }: ClientFormProps) 
 
   function validate(): boolean {
     const e: Record<string, string> = {};
-    if (!firstName.trim()) e.firstName = "Le pr\u00e9nom est requis";
+    if (!firstName.trim()) e.firstName = "Le prénom est requis";
     if (!lastName.trim()) e.lastName = "Le nom est requis";
     if (!email.trim()) e.email = "L'email est requis";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       e.email = "Email invalide";
-    if (!phone.trim()) e.phone = "Le t\u00e9l\u00e9phone est requis";
+    if (!phone.trim()) e.phone = "Le téléphone est requis";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -50,7 +50,7 @@ export function ClientForm({ initialData, onSubmit, onClose }: ClientFormProps) 
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <Input
-          label="Pr\u00e9nom"
+          label="Prénom"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
           error={errors.firstName}
@@ -70,7 +70,7 @@ export function ClientForm({ initialData, onSubmit, onClose }: ClientFormProps) 
         error={errors.email}
       />
       <Input
-        label="T\u00e9l\u00e9phone"
+        label="Téléphone"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
         error={errors.phone}

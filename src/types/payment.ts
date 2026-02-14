@@ -14,5 +14,7 @@ export interface Payment {
   method: PaymentMethod | null;
   reference: string | null;
   lateFee: number;
+  proofImageUrl: string | null;
   createdAt: string;
+  updatedAt: string | null;
 }

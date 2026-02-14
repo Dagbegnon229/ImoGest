@@ -16,6 +16,8 @@ export const mockPayments: Payment[] = [
     reference: 'VIR-2025-10-001',
     lateFee: 0,
     createdAt: '2025-09-25T08:00:00Z',
+    proofImageUrl: null,
+    updatedAt: null,
   },
   {
     id: 'PAY-002',
@@ -31,6 +33,8 @@ export const mockPayments: Payment[] = [
     reference: 'VIR-2025-11-001',
     lateFee: 0,
     createdAt: '2025-10-25T08:00:00Z',
+    proofImageUrl: null,
+    updatedAt: null,
   },
   {
     id: 'PAY-003',
@@ -46,6 +50,8 @@ export const mockPayments: Payment[] = [
     reference: 'VIR-2025-12-001',
     lateFee: 0,
     createdAt: '2025-11-25T08:00:00Z',
+    proofImageUrl: null,
+    updatedAt: null,
   },
   {
     id: 'PAY-004',
@@ -61,6 +67,8 @@ export const mockPayments: Payment[] = [
     reference: 'VIR-2026-01-001',
     lateFee: 0,
     createdAt: '2025-12-25T08:00:00Z',
+    proofImageUrl: null,
+    updatedAt: null,
   },
   {
     id: 'PAY-005',
@@ -76,6 +84,8 @@ export const mockPayments: Payment[] = [
     reference: null,
     lateFee: 0,
     createdAt: '2026-01-25T08:00:00Z',
+    proofImageUrl: null,
+    updatedAt: null,
   },
 
   // === CLT-2026-0002 / LSE-002 - Loyer: 7200 $ ===
@@ -93,6 +103,8 @@ export const mockPayments: Payment[] = [
     reference: 'CHQ-2025-10-002',
     lateFee: 0,
     createdAt: '2025-09-25T08:00:00Z',
+    proofImageUrl: null,
+    updatedAt: null,
   },
   {
     id: 'PAY-007',
@@ -108,6 +120,8 @@ export const mockPayments: Payment[] = [
     reference: 'ESP-2025-11-002',
     lateFee: 360,
     createdAt: '2025-10-25T08:00:00Z',
+    proofImageUrl: null,
+    updatedAt: null,
   },
   {
     id: 'PAY-008',
@@ -123,6 +137,8 @@ export const mockPayments: Payment[] = [
     reference: 'VIR-2025-12-002',
     lateFee: 0,
     createdAt: '2025-11-25T08:00:00Z',
+    proofImageUrl: null,
+    updatedAt: null,
   },
   {
     id: 'PAY-009',
@@ -138,6 +154,8 @@ export const mockPayments: Payment[] = [
     reference: 'CHQ-2026-01-002',
     lateFee: 360,
     createdAt: '2025-12-25T08:00:00Z',
+    proofImageUrl: null,
+    updatedAt: null,
   },
   {
     id: 'PAY-010',
@@ -153,6 +171,8 @@ export const mockPayments: Payment[] = [
     reference: null,
     lateFee: 0,
     createdAt: '2026-01-25T08:00:00Z',
+    proofImageUrl: null,
+    updatedAt: null,
   },
 
   // === CLT-2026-0003 / LSE-003 - Loyer: 5800 $ ===
@@ -170,6 +190,8 @@ export const mockPayments: Payment[] = [
     reference: 'CB-2025-10-003',
     lateFee: 0,
     createdAt: '2025-09-25T08:00:00Z',
+    proofImageUrl: null,
+    updatedAt: null,
   },
   {
     id: 'PAY-012',
@@ -185,6 +207,8 @@ export const mockPayments: Payment[] = [
     reference: 'CB-2025-11-003',
     lateFee: 0,
     createdAt: '2025-10-25T08:00:00Z',
+    proofImageUrl: null,
+    updatedAt: null,
   },
   {
     id: 'PAY-013',
@@ -200,6 +224,8 @@ export const mockPayments: Payment[] = [
     reference: 'VIR-2025-12-003',
     lateFee: 290,
     createdAt: '2025-11-25T08:00:00Z',
+    proofImageUrl: null,
+    updatedAt: null,
   },
   {
     id: 'PAY-014',
@@ -215,6 +241,8 @@ export const mockPayments: Payment[] = [
     reference: 'CB-2026-01-003',
     lateFee: 0,
     createdAt: '2025-12-25T08:00:00Z',
+    proofImageUrl: null,
+    updatedAt: null,
   },
   {
     id: 'PAY-015',
@@ -230,5 +258,7 @@ export const mockPayments: Payment[] = [
     reference: null,
     lateFee: 0,
     createdAt: '2026-01-25T08:00:00Z',
+    proofImageUrl: null,
+    updatedAt: null,
   },
 ];

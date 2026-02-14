@@ -36,12 +36,12 @@ export default function IncidentsPage() {
     { value: "", label: "Tous les statuts" },
     { value: "new", label: "Nouveau" },
     { value: "in_progress", label: "En cours" },
-    { value: "resolved", label: "R\u00e9solu" },
-    { value: "closed", label: "Ferm\u00e9" },
+    { value: "resolved", label: "Résolu" },
+    { value: "closed", label: "Fermé" },
   ];
 
   const priorityOptions = [
-    { value: "", label: "Toutes les priorit\u00e9s" },
+    { value: "", label: "Toutes les priorités" },
     { value: "low", label: "Basse" },
     { value: "medium", label: "Moyenne" },
     { value: "high", label: "Haute" },
@@ -85,16 +85,16 @@ export default function IncidentsPage() {
     return "--";
   }
 
-  async function handleAdd(data: Omit<Incident, "id" | "createdAt">) {
+  async function handleAdd(data: Omit<Incident, "id" | "createdAt" | "updatedAt">) {
     try {
       await addIncident({
         ...data,
         reportedBy: user?.id ?? "",
       });
       setShowModal(false);
-      showToast("Incident cr\u00e9\u00e9 avec succ\u00e8s", "success");
+      showToast("Incident créé avec succès", "success");
     } catch {
-      showToast("Erreur lors de l'op\u00e9ration", "error");
+      showToast("Erreur lors de l'opération", "error");
     }
   }
 
@@ -144,8 +144,8 @@ export default function IncidentsPage() {
         {filtered.length === 0 ? (
           <EmptyState
             icon={<AlertTriangle className="h-10 w-10" />}
-            title="Aucun incident trouv\u00e9"
-            description="Ajustez vos filtres ou cr\u00e9ez un nouvel incident."
+            title="Aucun incident trouvé"
+            description="Ajustez vos filtres ou créez un nouvel incident."
           />
         ) : (
           <div className="overflow-x-auto">
@@ -210,7 +210,7 @@ export default function IncidentsPage() {
                       <Link
                         href={`/admin/incidents/${inc.id}`}
                         className="rounded-lg p-1.5 text-[#6b7280] hover:bg-gray-100 hover:text-[#171717] transition-colors inline-flex"
-                        title="Voir d\u00e9tails"
+                        title="Voir détails"
                       >
                         <Eye className="h-4 w-4" />
                       </Link>

@@ -12,4 +12,5 @@ export interface Lease {
   status: LeaseStatus;
   createdAt: string;
   createdBy: string;
+  updatedAt: string | null;
 }

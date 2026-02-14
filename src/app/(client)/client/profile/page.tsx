@@ -8,13 +8,12 @@ import {
   Shield,
   Calendar,
   Lock,
-  Save,
   IdCard,
 } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
-import { Card, Button, Input, Badge } from "@/components/ui";
+import { Card, Button, Input } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
 import { tenantStatusLabels, tenantStatusColors } from "@/lib/constants";
 
@@ -28,14 +27,6 @@ export default function ProfilePage() {
     [tenants, user?.id],
   );
 
-  // Personal info form state
-  const [firstName, setFirstName] = useState(tenant?.firstName ?? "");
-  const [lastName, setLastName] = useState(tenant?.lastName ?? "");
-  const [email, setEmail] = useState(tenant?.email ?? "");
-  const [phone, setPhone] = useState(tenant?.phone ?? "");
-  const [isSavingInfo, setIsSavingInfo] = useState(false);
-  const [infoErrors, setInfoErrors] = useState<Record<string, string>>({});
-
   // Password form state
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -44,40 +35,6 @@ export default function ProfilePage() {
   const [passwordErrors, setPasswordErrors] = useState<Record<string, string>>(
     {},
   );
-
-  function validateInfo(): boolean {
-    const errors: Record<string, string> = {};
-    if (!firstName.trim()) errors.firstName = "Le prénom est requis";
-    if (!lastName.trim()) errors.lastName = "Le nom est requis";
-    if (!email.trim()) {
-      errors.email = "L'email est requis";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = "Format d'email invalide";
-    }
-    if (!phone.trim()) errors.phone = "Le téléphone est requis";
-    setInfoErrors(errors);
-    return Object.keys(errors).length === 0;
-  }
-
-  async function handleSaveInfo(e: React.FormEvent) {
-    e.preventDefault();
-    if (!validateInfo() || !tenant) return;
-
-    setIsSavingInfo(true);
-    try {
-      await updateTenant(tenant.id, {
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-      });
-      showToast("Profil mis à jour avec succès", "success");
-    } catch {
-      showToast("Erreur lors de la mise à jour du profil", "error");
-    } finally {
-      setIsSavingInfo(false);
-    }
-  }
 
   function validatePassword(): boolean {
     const errors: Record<string, string> = {};
@@ -137,81 +94,53 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: editable forms */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Section 1: Personal Information */}
-          <form onSubmit={handleSaveInfo}>
-            <Card
-              header={
-                <div className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-[#10b981]" />
-                  <h2 className="text-lg font-semibold text-[#0f1b2d]">
-                    Informations personnelles
-                  </h2>
+          {/* Section 1: Personal Information (read-only) */}
+          <Card
+            header={
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5 text-[#10b981]" />
+                <h2 className="text-lg font-semibold text-[#0f1b2d]">
+                  Informations personnelles
+                </h2>
+              </div>
+            }
+          >
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-[#6b7280] mb-1">Prénom</p>
+                  <div className="flex items-center gap-2 px-3 py-2 bg-[#f8fafc] rounded-lg border border-[#e5e7eb]">
+                    <User className="h-4 w-4 text-[#6b7280]" />
+                    <p className="text-sm font-medium text-[#0f1b2d]">{tenant.firstName}</p>
+                  </div>
                 </div>
-              }
-            >
-              <div className="space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Input
-                    label="Prénom"
-                    value={firstName}
-                    onChange={(e) => {
-                      setFirstName(e.target.value);
-                      if (infoErrors.firstName)
-                        setInfoErrors((p) => ({ ...p, firstName: "" }));
-                    }}
-                    error={infoErrors.firstName}
-                    icon={<User className="h-4 w-4" />}
-                  />
-                  <Input
-                    label="Nom"
-                    value={lastName}
-                    onChange={(e) => {
-                      setLastName(e.target.value);
-                      if (infoErrors.lastName)
-                        setInfoErrors((p) => ({ ...p, lastName: "" }));
-                    }}
-                    error={infoErrors.lastName}
-                    icon={<User className="h-4 w-4" />}
-                  />
-                </div>
-                <Input
-                  label="Email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (infoErrors.email)
-                      setInfoErrors((p) => ({ ...p, email: "" }));
-                  }}
-                  error={infoErrors.email}
-                  icon={<Mail className="h-4 w-4" />}
-                />
-                <Input
-                  label="Téléphone"
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => {
-                    setPhone(e.target.value);
-                    if (infoErrors.phone)
-                      setInfoErrors((p) => ({ ...p, phone: "" }));
-                  }}
-                  error={infoErrors.phone}
-                  icon={<Phone className="h-4 w-4" />}
-                />
-                <div className="flex justify-end pt-2">
-                  <Button
-                    type="submit"
-                    variant="secondary"
-                    isLoading={isSavingInfo}
-                    className="gap-2"
-                  >
-                    <Save className="h-4 w-4" />
-                    Enregistrer
-                  </Button>
+                <div>
+                  <p className="text-xs text-[#6b7280] mb-1">Nom</p>
+                  <div className="flex items-center gap-2 px-3 py-2 bg-[#f8fafc] rounded-lg border border-[#e5e7eb]">
+                    <User className="h-4 w-4 text-[#6b7280]" />
+                    <p className="text-sm font-medium text-[#0f1b2d]">{tenant.lastName}</p>
+                  </div>
                 </div>
               </div>
-            </Card>
-          </form>
+              <div>
+                <p className="text-xs text-[#6b7280] mb-1">Email</p>
+                <div className="flex items-center gap-2 px-3 py-2 bg-[#f8fafc] rounded-lg border border-[#e5e7eb]">
+                  <Mail className="h-4 w-4 text-[#6b7280]" />
+                  <p className="text-sm font-medium text-[#0f1b2d]">{tenant.email}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-[#6b7280] mb-1">Téléphone</p>
+                <div className="flex items-center gap-2 px-3 py-2 bg-[#f8fafc] rounded-lg border border-[#e5e7eb]">
+                  <Phone className="h-4 w-4 text-[#6b7280]" />
+                  <p className="text-sm font-medium text-[#0f1b2d]">{tenant.phone}</p>
+                </div>
+              </div>
+              <p className="text-xs text-[#9ca3af] italic">
+                Pour modifier vos informations personnelles, veuillez contacter votre administrateur.
+              </p>
+            </div>
+          </Card>
 
           {/* Section 3: Change Password */}
           <form onSubmit={handleChangePassword}>

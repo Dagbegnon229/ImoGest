@@ -11,4 +11,5 @@ export interface Building {
   yearBuilt: number;
   managerId: string | null;
   createdAt: string;
+  updatedAt: string | null;
 }

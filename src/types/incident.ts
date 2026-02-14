@@ -13,4 +13,5 @@ export interface Incident {
   priority: IncidentPriority;
   createdAt: string;
   resolvedAt: string | null;
+  updatedAt: string | null;
 }

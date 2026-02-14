@@ -13,6 +13,7 @@ export const mockIncidents: Incident[] = [
     priority: 'high',
     createdAt: '2026-01-20T08:30:00Z',
     resolvedAt: null,
+    updatedAt: null,
   },
   {
     id: 'INC-002',
@@ -26,6 +27,7 @@ export const mockIncidents: Incident[] = [
     priority: 'urgent',
     createdAt: '2026-02-01T10:00:00Z',
     resolvedAt: null,
+    updatedAt: null,
   },
   {
     id: 'INC-003',
@@ -39,6 +41,7 @@ export const mockIncidents: Incident[] = [
     priority: 'medium',
     createdAt: '2026-02-03T14:15:00Z',
     resolvedAt: null,
+    updatedAt: null,
   },
   {
     id: 'INC-004',
@@ -52,6 +55,7 @@ export const mockIncidents: Incident[] = [
     priority: 'low',
     createdAt: '2026-01-25T20:00:00Z',
     resolvedAt: null,
+    updatedAt: null,
   },
   {
     id: 'INC-005',
@@ -65,6 +69,7 @@ export const mockIncidents: Incident[] = [
     priority: 'urgent',
     createdAt: '2026-02-05T07:45:00Z',
     resolvedAt: null,
+    updatedAt: null,
   },
   {
     id: 'INC-006',
@@ -78,6 +83,7 @@ export const mockIncidents: Incident[] = [
     priority: 'high',
     createdAt: '2026-01-10T09:00:00Z',
     resolvedAt: '2026-01-18T16:30:00Z',
+    updatedAt: null,
   },
   {
     id: 'INC-007',
@@ -91,5 +97,6 @@ export const mockIncidents: Incident[] = [
     priority: 'high',
     createdAt: '2026-02-07T11:30:00Z',
     resolvedAt: null,
+    updatedAt: null,
   },
 ];

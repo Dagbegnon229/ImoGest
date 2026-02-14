@@ -90,7 +90,7 @@ export default function ClientsPage() {
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
           <div className="flex-1">
             <Input
-              placeholder="Rechercher par nom, ID, email ou t\u00e9l\u00e9phone..."
+              placeholder="Rechercher par nom, ID, email ou téléphone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               icon={<Search className="h-4 w-4" />}
@@ -115,7 +115,7 @@ export default function ClientsPage() {
         {filtered.length === 0 ? (
           <EmptyState
             icon={<Users className="h-10 w-10" />}
-            title="Aucun client trouv\u00e9"
+            title="Aucun client trouvé"
             description="Ajustez vos filtres ou ajoutez un nouveau client."
           />
         ) : (
@@ -178,7 +178,7 @@ export default function ClientsPage() {
                       <Link
                         href={`/admin/clients/${tenant.id}`}
                         className="rounded-lg p-1.5 text-[#6b7280] hover:bg-gray-100 hover:text-[#171717] transition-colors inline-flex"
-                        title="Voir d\u00e9tails"
+                        title="Voir détails"
                       >
                         <Eye className="h-4 w-4" />
                       </Link>

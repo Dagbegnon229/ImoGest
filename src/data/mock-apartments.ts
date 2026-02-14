@@ -13,6 +13,7 @@ export const mockApartments: Apartment[] = [
     status: 'occupied',
     tenantId: 'CLT-2026-0001',
     images: [],
+    updatedAt: null,
   },
   {
     id: 'APT-002',
@@ -25,6 +26,7 @@ export const mockApartments: Apartment[] = [
     status: 'available',
     tenantId: null,
     images: [],
+    updatedAt: null,
   },
   {
     id: 'APT-003',
@@ -37,6 +39,7 @@ export const mockApartments: Apartment[] = [
     status: 'occupied',
     tenantId: 'CLT-2026-0005',
     images: [],
+    updatedAt: null,
   },
   // BLD-002 - Tour Casablanca
   {
@@ -50,6 +53,7 @@ export const mockApartments: Apartment[] = [
     status: 'maintenance',
     tenantId: null,
     images: [],
+    updatedAt: null,
   },
   {
     id: 'APT-005',
@@ -62,6 +66,7 @@ export const mockApartments: Apartment[] = [
     status: 'occupied',
     tenantId: 'CLT-2026-0002',
     images: [],
+    updatedAt: null,
   },
   {
     id: 'APT-006',
@@ -74,6 +79,7 @@ export const mockApartments: Apartment[] = [
     status: 'available',
     tenantId: null,
     images: [],
+    updatedAt: null,
   },
   // BLD-003 - Immeuble Rabat
   {
@@ -87,6 +93,7 @@ export const mockApartments: Apartment[] = [
     status: 'available',
     tenantId: null,
     images: [],
+    updatedAt: null,
   },
   {
     id: 'APT-008',
@@ -99,6 +106,7 @@ export const mockApartments: Apartment[] = [
     status: 'occupied',
     tenantId: 'CLT-2026-0003',
     images: [],
+    updatedAt: null,
   },
   // BLD-004 - Villa Marrakech
   {
@@ -112,6 +120,7 @@ export const mockApartments: Apartment[] = [
     status: 'maintenance',
     tenantId: null,
     images: [],
+    updatedAt: null,
   },
   {
     id: 'APT-010',
@@ -124,6 +133,7 @@ export const mockApartments: Apartment[] = [
     status: 'occupied',
     tenantId: 'CLT-2026-0004',
     images: [],
+    updatedAt: null,
   },
   // BLD-005 - Résidence Atlas
   {
@@ -137,6 +147,7 @@ export const mockApartments: Apartment[] = [
     status: 'available',
     tenantId: null,
     images: [],
+    updatedAt: null,
   },
   {
     id: 'APT-012',
@@ -149,5 +160,6 @@ export const mockApartments: Apartment[] = [
     status: 'available',
     tenantId: null,
     images: [],
+    updatedAt: null,
   },
 ];

@@ -13,6 +13,7 @@ export const mockLeases: Lease[] = [
     status: 'active',
     createdAt: '2025-06-15T10:00:00Z',
     createdBy: 'ADM-0010',
+    updatedAt: null,
   },
   {
     id: 'LSE-002',
@@ -26,6 +27,7 @@ export const mockLeases: Lease[] = [
     status: 'active',
     createdAt: '2025-07-20T14:00:00Z',
     createdBy: 'ADM-0010',
+    updatedAt: null,
   },
   {
     id: 'LSE-003',
@@ -39,6 +41,7 @@ export const mockLeases: Lease[] = [
     status: 'active',
     createdAt: '2025-08-15T09:30:00Z',
     createdBy: 'ADM-0100',
+    updatedAt: null,
   },
   {
     id: 'LSE-004',
@@ -52,6 +55,7 @@ export const mockLeases: Lease[] = [
     status: 'active',
     createdAt: '2025-09-15T11:00:00Z',
     createdBy: 'ADM-0100',
+    updatedAt: null,
   },
   {
     id: 'LSE-005',
@@ -65,5 +69,6 @@ export const mockLeases: Lease[] = [
     status: 'active',
     createdAt: '2025-10-15T08:00:00Z',
     createdBy: 'ADM-0010',
+    updatedAt: null,
   },
 ];

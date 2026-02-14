@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useData } from "@/contexts/DataContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
-import { Card, Button, Input, Select, Textarea, Badge, EmptyState } from "@/components/ui";
+import { Card, Button, Input, Select, Textarea, Badge, EmptyState, Modal } from "@/components/ui";
 import { generateTenantId } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -17,6 +17,9 @@ import {
   Download,
   Image as ImageIcon,
   ExternalLink,
+  Mail,
+  Copy,
+  Send,
 } from "lucide-react";
 import { formatFileSize } from "@/lib/utils";
 import {
@@ -50,6 +53,7 @@ export default function ApplicationReviewPage() {
   const [apartmentId, setApartmentId] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [endDateIsToday, setEndDateIsToday] = useState(false);
   const [rent, setRent] = useState("");
   const [deposit, setDeposit] = useState("");
   const [approveNote, setApproveNote] = useState("");
@@ -58,6 +62,8 @@ export default function ApplicationReviewPage() {
   // Reject form state
   const [rejectNote, setRejectNote] = useState("");
   const [rejectError, setRejectError] = useState("");
+  const [showRejectPreview, setShowRejectPreview] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -75,7 +81,7 @@ export default function ApplicationReviewPage() {
 
   const aptOptions = availableApts.map((a) => ({
     value: a.id,
-    label: `Unit\u00e9 ${a.unitNumber} - \u00c9tage ${a.floor} - ${a.rent} $/mois`,
+    label: `Unité ${a.unitNumber} - Étage ${a.floor} - ${a.rent} $/mois`,
   }));
 
   if (!application) {
@@ -87,7 +93,7 @@ export default function ApplicationReviewPage() {
         <EmptyState
           icon={<ClipboardList className="h-10 w-10" />}
           title="Demande introuvable"
-          description="La demande demand\u00e9e n'existe pas."
+          description="La demande demandée n'existe pas."
         />
       </div>
     );
@@ -103,8 +109,8 @@ export default function ApplicationReviewPage() {
     if (!apartmentId) e.apartmentId = "Requis";
     if (!startDate) e.startDate = "Requis";
     if (!endDate) e.endDate = "Requis";
-    if (startDate && endDate && new Date(endDate) <= new Date(startDate))
-      e.endDate = "Doit \u00eatre apr\u00e8s la date de d\u00e9but";
+    if (startDate && endDate && new Date(endDate) < new Date(startDate))
+      e.endDate = "Doit être après ou égale à la date de début";
     if (!rent || Number(rent) <= 0) e.rent = "Invalide";
     if (!deposit || Number(deposit) < 0) e.deposit = "Invalide";
     setApproveErrors(e);
@@ -121,7 +127,7 @@ export default function ApplicationReviewPage() {
         monthlyRent: Number(rent),
         depositAmount: Number(deposit),
       });
-      showToast("Demande approuv\u00e9e - Compte client cr\u00e9\u00e9", "success");
+      showToast("Demande approuvée - Compte client créé", "success");
       router.push("/admin/applications");
     } catch {
       showToast("Erreur lors de l'approbation", "error");
@@ -130,21 +136,53 @@ export default function ApplicationReviewPage() {
     }
   }
 
-  async function handleReject() {
+  function openRejectPreview() {
     if (!rejectNote.trim()) {
       setRejectError("Veuillez fournir une raison de rejet");
       return;
     }
+    setShowRejectPreview(true);
+  }
+
+  async function doReject() {
     setIsSubmitting(true);
     try {
       await rejectApplication(appId, user?.id ?? "", rejectNote.trim());
-      showToast("Demande rejet\u00e9e", "success");
+      showToast("Demande rejetée", "success");
       router.push("/admin/applications");
     } catch {
       showToast("Erreur lors du rejet", "error");
     } finally {
       setIsSubmitting(false);
+      setShowRejectPreview(false);
     }
+  }
+
+  async function handleRejectWithEmail() {
+    setIsSendingEmail(true);
+    try {
+      const res = await fetch("/api/send-rejection-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: application?.email,
+          applicantName: `${application?.firstName} ${application?.lastName}`,
+          reason: rejectNote.trim(),
+        }),
+      });
+      if (!res.ok) throw new Error("Email failed");
+      showToast("Email de rejet envoyé", "success");
+      await doReject();
+    } catch {
+      showToast("Erreur d'envoi de l'email. La demande n'a pas été rejetée.", "error");
+      setIsSendingEmail(false);
+    }
+  }
+
+  function handleCopyTemplate() {
+    const template = `Bonjour ${application?.firstName} ${application?.lastName},\n\nNous vous remercions pour votre demande de logement soumise sur notre plateforme ImoGest.\n\nAprès examen attentif de votre dossier, nous avons le regret de vous informer que votre demande n'a pas pu être retenue.\n\nMotif : ${rejectNote.trim()}\n\nVous pouvez soumettre une nouvelle demande si votre situation change. N'hésitez pas à nous contacter pour toute question.\n\nCordialement,\nL'équipe ImoGest`;
+    navigator.clipboard.writeText(template);
+    showToast("Modèle copié dans le presse-papier", "success");
   }
 
   const isPending = application.status === "pending_review";
@@ -333,7 +371,7 @@ export default function ApplicationReviewPage() {
                   setApartmentId("");
                 }}
                 options={buildingOptions}
-                placeholder="S\u00e9lectionner un immeuble"
+                placeholder="Sélectionner un immeuble"
                 error={approveErrors.buildingId}
               />
               <Select
@@ -348,7 +386,7 @@ export default function ApplicationReviewPage() {
                 placeholder={
                   buildingId
                     ? availableApts.length > 0
-                      ? "S\u00e9lectionner"
+                      ? "Sélectionner"
                       : "Aucun disponible"
                     : "Choisir un immeuble"
                 }
@@ -359,19 +397,39 @@ export default function ApplicationReviewPage() {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <Input
-                label="D\u00e9but du bail"
+                label="Début du bail"
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 error={approveErrors.startDate}
               />
-              <Input
-                label="Fin du bail"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                error={approveErrors.endDate}
-              />
+              <div>
+                <Input
+                  label="Date d'abonnement"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => {
+                    setEndDate(e.target.value);
+                    setEndDateIsToday(false);
+                  }}
+                  error={approveErrors.endDate}
+                  disabled={endDateIsToday}
+                />
+                <label className="flex items-center gap-2 mt-1.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={endDateIsToday}
+                    onChange={(e) => {
+                      setEndDateIsToday(e.target.checked);
+                      if (e.target.checked) {
+                        setEndDate(new Date().toISOString().split("T")[0]);
+                      }
+                    }}
+                    className="rounded border-gray-300 text-[#10b981] focus:ring-[#10b981]"
+                  />
+                  <span className="text-xs text-[#6b7280]">À ce jour</span>
+                </label>
+              </div>
               <Input
                 label="Loyer ($)"
                 type="number"
@@ -381,7 +439,7 @@ export default function ApplicationReviewPage() {
                 min={0}
               />
               <Input
-                label="D\u00e9p\u00f4t ($)"
+                label="Dépôt ($)"
                 type="number"
                 value={deposit}
                 onChange={(e) => setDeposit(e.target.value)}
@@ -435,8 +493,7 @@ export default function ApplicationReviewPage() {
             <div className="flex justify-end">
               <Button
                 variant="danger"
-                onClick={handleReject}
-                isLoading={isSubmitting}
+                onClick={openRejectPreview}
               >
                 <XCircle className="h-4 w-4" />
                 Rejeter la demande
@@ -445,6 +502,72 @@ export default function ApplicationReviewPage() {
           </div>
         </Card>
       )}
+
+      {/* Reject Preview Modal */}
+      <Modal
+        isOpen={showRejectPreview}
+        onClose={() => setShowRejectPreview(false)}
+        title="Confirmer le rejet"
+        size="lg"
+      >
+        <div className="space-y-4">
+          <div className="bg-[#f8fafc] rounded-lg p-4 border border-[#e5e7eb]">
+            <h3 className="text-sm font-semibold text-[#171717] mb-2">Aperçu de l'email</h3>
+            <div className="text-sm text-[#6b7280] space-y-2">
+              <p><strong>Destinataire :</strong> {application?.email}</p>
+              <p><strong>Objet :</strong> ImoGest - Résultat de votre demande de logement</p>
+              <hr className="border-[#e5e7eb]" />
+              <p>Bonjour {application?.firstName} {application?.lastName},</p>
+              <p>
+                Nous vous remercions pour votre demande de logement soumise sur notre plateforme ImoGest.
+                Après examen attentif de votre dossier, nous avons le regret de vous informer que votre demande n'a pas pu être retenue.
+              </p>
+              <div className="bg-red-50 border-l-4 border-red-400 p-3 rounded-r-lg">
+                <p className="text-xs font-semibold text-red-800">Motif :</p>
+                <p className="text-sm text-[#171717]">{rejectNote}</p>
+              </div>
+              <p>
+                Vous pouvez soumettre une nouvelle demande si votre situation change.
+              </p>
+              <p className="text-[#171717]">Cordialement, L'équipe ImoGest</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Button
+              onClick={handleRejectWithEmail}
+              isLoading={isSendingEmail}
+              className="w-full justify-center gap-2"
+            >
+              <Send className="h-4 w-4" />
+              Envoyer l'email et rejeter
+            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  handleCopyTemplate();
+                  doReject();
+                }}
+                isLoading={isSubmitting}
+                className="flex-1 justify-center gap-2"
+              >
+                <Copy className="h-4 w-4" />
+                Copier le modèle et rejeter
+              </Button>
+              <Button
+                variant="danger"
+                onClick={doReject}
+                isLoading={isSubmitting}
+                className="flex-1 justify-center gap-2"
+              >
+                <XCircle className="h-4 w-4" />
+                Rejeter sans email
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

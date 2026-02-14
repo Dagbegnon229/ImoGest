@@ -94,6 +94,11 @@ function mapTenantRow(row: Record<string, unknown>): Tenant {
     createdAt: row.created_at as string,
     createdBy: (row.created_by as string) ?? null,
     statusChangedAt: (row.status_changed_at as string) ?? null,
+    updatedAt: (row.updated_at as string) ?? null,
+    promoCredits: (row.promo_credits as number) ?? 0,
+    notes: (row.notes as string) ?? null,
+    emergencyContact: (row.emergency_contact as string) ?? null,
+    emergencyPhone: (row.emergency_phone as string) ?? null,
   };
 }
 
@@ -244,7 +249,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const admin = mapAdminRow(data);
 
           if (!admin.isActive) {
-            return { success: false, error: "Ce compte administrateur est d\u00e9sactiv\u00e9" };
+            return { success: false, error: "Ce compte administrateur est désactivé" };
           }
           if (admin.password !== password) {
             return { success: false, error: "Identifiant ou mot de passe incorrect" };
@@ -322,7 +327,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       newPassword: string,
     ): Promise<{ success: boolean; error?: string }> => {
       if (!user) {
-        return { success: false, error: "Non connect\u00e9" };
+        return { success: false, error: "Non connecté" };
       }
 
       try {
@@ -336,7 +341,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .single();
 
         if (fetchError || !current) {
-          return { success: false, error: "Impossible de v\u00e9rifier le mot de passe" };
+          return { success: false, error: "Impossible de vérifier le mot de passe" };
         }
 
         if ((current as Record<string, unknown>).password !== oldPassword) {

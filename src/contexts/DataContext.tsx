@@ -58,7 +58,7 @@ interface DataContextType {
 
   // Buildings
   getBuilding: (id: string) => Building | undefined;
-  addBuilding: (data: Omit<Building, 'id' | 'createdAt'>) => Promise<Building>;
+  addBuilding: (data: Omit<Building, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Building>;
   updateBuilding: (id: string, data: Partial<Building>) => Promise<void>;
   deleteBuilding: (id: string) => Promise<void>;
 
@@ -66,12 +66,12 @@ interface DataContextType {
   getApartment: (id: string) => Apartment | undefined;
   getApartmentsByBuilding: (buildingId: string) => Apartment[];
   getAvailableApartments: (buildingId?: string) => Apartment[];
-  addApartment: (data: Omit<Apartment, 'id'>) => Promise<Apartment>;
+  addApartment: (data: Omit<Apartment, 'id' | 'updatedAt'>) => Promise<Apartment>;
   updateApartment: (id: string, data: Partial<Apartment>) => Promise<void>;
 
   // Tenants
   getTenant: (id: string) => Tenant | undefined;
-  addTenant: (data: Omit<Tenant, 'id' | 'createdAt'>) => Promise<Tenant>;
+  addTenant: (data: Omit<Tenant, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Tenant>;
   updateTenant: (id: string, data: Partial<Tenant>) => Promise<void>;
   deleteTenant: (id: string) => Promise<void>;
 
@@ -88,14 +88,14 @@ interface DataContextType {
   // Leases
   getLease: (id: string) => Lease | undefined;
   getLeaseByTenant: (tenantId: string) => Lease | undefined;
-  addLease: (data: Omit<Lease, 'id' | 'createdAt'>) => Promise<Lease>;
+  addLease: (data: Omit<Lease, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Lease>;
   updateLease: (id: string, data: Partial<Lease>) => Promise<void>;
 
   // Incidents
   getIncident: (id: string) => Incident | undefined;
   getIncidentsByTenant: (tenantId: string) => Incident[];
   getIncidentsByBuilding: (buildingId: string) => Incident[];
-  addIncident: (data: Omit<Incident, 'id' | 'createdAt'>) => Promise<Incident>;
+  addIncident: (data: Omit<Incident, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Incident>;
   updateIncident: (id: string, data: Partial<Incident>) => Promise<void>;
 
   // Applications
@@ -123,7 +123,7 @@ interface DataContextType {
   // Payments
   getPayment: (id: string) => Payment | undefined;
   getPaymentsByTenant: (tenantId: string) => Payment[];
-  addPayment: (data: Omit<Payment, 'id' | 'createdAt'>) => Promise<Payment>;
+  addPayment: (data: Omit<Payment, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Payment>;
   updatePayment: (id: string, data: Partial<Payment>) => Promise<void>;
 
   // Points
@@ -203,6 +203,7 @@ async function fetchBuildings(): Promise<Building[]> {
     yearBuilt: row.year_built,
     managerId: row.manager_id,
     createdAt: row.created_at,
+    updatedAt: row.updated_at ?? null,
   } as Building));
 }
 
@@ -220,6 +221,7 @@ async function fetchApartments(): Promise<Apartment[]> {
     status: row.status,
     tenantId: row.tenant_id,
     images: row.images ?? [],
+    updatedAt: row.updated_at ?? null,
   } as Apartment));
 }
 
@@ -241,6 +243,11 @@ async function fetchTenants(): Promise<Tenant[]> {
     createdAt: row.created_at,
     createdBy: row.created_by,
     statusChangedAt: row.status_changed_at,
+    updatedAt: row.updated_at ?? null,
+    promoCredits: row.promo_credits ?? 0,
+    notes: row.notes ?? null,
+    emergencyContact: row.emergency_contact ?? null,
+    emergencyPhone: row.emergency_phone ?? null,
   } as Tenant));
 }
 
@@ -259,6 +266,7 @@ async function fetchLeases(): Promise<Lease[]> {
     status: row.status,
     createdAt: row.created_at,
     createdBy: row.created_by,
+    updatedAt: row.updated_at ?? null,
   } as Lease));
 }
 
@@ -277,6 +285,7 @@ async function fetchIncidents(): Promise<Incident[]> {
     priority: row.priority,
     createdAt: row.created_at,
     resolvedAt: row.resolved_at,
+    updatedAt: row.updated_at ?? null,
   } as Incident));
 }
 
@@ -317,7 +326,9 @@ async function fetchPayments(): Promise<Payment[]> {
     method: row.method,
     reference: row.reference,
     lateFee: row.late_fee,
+    proofImageUrl: row.proof_image_url ?? null,
     createdAt: row.created_at,
+    updatedAt: row.updated_at ?? null,
   } as Payment));
 }
 
@@ -485,7 +496,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   );
 
   const addBuilding = useCallback(
-    async (data: Omit<Building, 'id' | 'createdAt'>): Promise<Building> => {
+    async (data: Omit<Building, 'id' | 'createdAt' | 'updatedAt'>): Promise<Building> => {
       const id = generateBuildingId(buildings);
       const { data: row, error } = await supabase
         .from('buildings')
@@ -518,6 +529,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         yearBuilt: row.year_built,
         managerId: row.manager_id,
         createdAt: row.created_at,
+        updatedAt: row.updated_at ?? null,
       };
       setBuildings((prev) => [...prev, newBuilding]);
       return newBuilding;
@@ -538,11 +550,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (data.floors !== undefined) updatePayload.floors = data.floors;
       if (data.yearBuilt !== undefined) updatePayload.year_built = data.yearBuilt;
       if (data.managerId !== undefined) updatePayload.manager_id = data.managerId;
+      updatePayload.updated_at = new Date().toISOString();
 
       const { error } = await supabase.from('buildings').update(updatePayload).eq('id', id);
       if (error) throw error;
       setBuildings((prev) =>
-        prev.map((b) => (b.id === id ? { ...b, ...data, id: b.id } : b)),
+        prev.map((b) => (b.id === id ? { ...b, ...data, updatedAt: new Date().toISOString(), id: b.id } : b)),
       );
     },
     [],
@@ -580,7 +593,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   );
 
   const addApartment = useCallback(
-    async (data: Omit<Apartment, 'id'>): Promise<Apartment> => {
+    async (data: Omit<Apartment, 'id' | 'updatedAt'>): Promise<Apartment> => {
       const id = generateApartmentId(apartments);
       const { data: row, error } = await supabase
         .from('apartments')
@@ -610,6 +623,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         status: row.status,
         tenantId: row.tenant_id,
         images: row.images ?? [],
+        updatedAt: row.updated_at ?? null,
       };
       setApartments((prev) => [...prev, newApt]);
       return newApt;
@@ -628,11 +642,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (data.rent !== undefined) updatePayload.rent = data.rent;
       if (data.status !== undefined) updatePayload.status = data.status;
       if (data.tenantId !== undefined) updatePayload.tenant_id = data.tenantId;
+      if (data.images !== undefined) updatePayload.images = data.images;
+      updatePayload.updated_at = new Date().toISOString();
 
       const { error } = await supabase.from('apartments').update(updatePayload).eq('id', id);
       if (error) throw error;
       setApartments((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, ...data, id: a.id } : a)),
+        prev.map((a) => (a.id === id ? { ...a, ...data, updatedAt: new Date().toISOString(), id: a.id } : a)),
       );
     },
     [],
@@ -648,7 +664,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   );
 
   const addTenant = useCallback(
-    async (data: Omit<Tenant, 'id' | 'createdAt'>): Promise<Tenant> => {
+    async (data: Omit<Tenant, 'id' | 'createdAt' | 'updatedAt'>): Promise<Tenant> => {
       const id = generateTenantId(tenants);
       const { data: row, error } = await supabase
         .from('tenants')
@@ -666,6 +682,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
           must_change_password: data.mustChangePassword,
           created_by: data.createdBy,
           status_changed_at: new Date().toISOString(),
+          promo_credits: 0,
+          notes: null,
+          emergency_contact: null,
+          emergency_phone: null,
         })
         .select()
         .single();
@@ -685,6 +705,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
         createdAt: row.created_at,
         createdBy: row.created_by,
         statusChangedAt: row.status_changed_at,
+        updatedAt: row.updated_at ?? null,
+        promoCredits: row.promo_credits ?? 0,
+        notes: row.notes ?? null,
+        emergencyContact: row.emergency_contact ?? null,
+        emergencyPhone: row.emergency_phone ?? null,
       };
       setTenants((prev) => [...prev, newTenant]);
       return newTenant;
@@ -709,13 +734,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (data.leaseId !== undefined) updatePayload.lease_id = data.leaseId;
       if (data.mustChangePassword !== undefined) updatePayload.must_change_password = data.mustChangePassword;
       if (data.createdBy !== undefined) updatePayload.created_by = data.createdBy;
+      if (data.promoCredits !== undefined) updatePayload.promo_credits = data.promoCredits;
+      updatePayload.updated_at = new Date().toISOString();
 
       const { error } = await supabase.from('tenants').update(updatePayload).eq('id', id);
       if (error) throw error;
       setTenants((prev) =>
         prev.map((t) => {
           if (t.id !== id) return t;
-          const updated = { ...t, ...data, id: t.id };
+          const updated = { ...t, ...data, updatedAt: new Date().toISOString(), id: t.id };
           if (data.status !== undefined) {
             updated.statusChangedAt = new Date().toISOString();
           }
@@ -893,7 +920,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   );
 
   const addLease = useCallback(
-    async (data: Omit<Lease, 'id' | 'createdAt'>): Promise<Lease> => {
+    async (data: Omit<Lease, 'id' | 'createdAt' | 'updatedAt'>): Promise<Lease> => {
       const id = generateLeaseId(leases);
       const { data: row, error } = await supabase
         .from('leases')
@@ -924,6 +951,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         status: row.status,
         createdAt: row.created_at,
         createdBy: row.created_by,
+        updatedAt: row.updated_at ?? null,
       };
       setLeases((prev) => [...prev, newLease]);
       return newLease;
@@ -943,11 +971,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (data.depositAmount !== undefined) updatePayload.deposit_amount = data.depositAmount;
       if (data.status !== undefined) updatePayload.status = data.status;
       if (data.createdBy !== undefined) updatePayload.created_by = data.createdBy;
+      updatePayload.updated_at = new Date().toISOString();
 
       const { error } = await supabase.from('leases').update(updatePayload).eq('id', id);
       if (error) throw error;
       setLeases((prev) =>
-        prev.map((l) => (l.id === id ? { ...l, ...data, id: l.id } : l)),
+        prev.map((l) => (l.id === id ? { ...l, ...data, updatedAt: new Date().toISOString(), id: l.id } : l)),
       );
     },
     [],
@@ -973,7 +1002,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   );
 
   const addIncident = useCallback(
-    async (data: Omit<Incident, 'id' | 'createdAt'>): Promise<Incident> => {
+    async (data: Omit<Incident, 'id' | 'createdAt' | 'updatedAt'>): Promise<Incident> => {
       const id = generateIncidentId(incidents);
       const { data: row, error } = await supabase
         .from('incidents')
@@ -1004,6 +1033,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         priority: row.priority,
         createdAt: row.created_at,
         resolvedAt: row.resolved_at,
+        updatedAt: row.updated_at ?? null,
       };
       setIncidents((prev) => [...prev, newIncident]);
       return newIncident;
@@ -1023,11 +1053,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (data.status !== undefined) updatePayload.status = data.status;
       if (data.priority !== undefined) updatePayload.priority = data.priority;
       if (data.resolvedAt !== undefined) updatePayload.resolved_at = data.resolvedAt;
+      updatePayload.updated_at = new Date().toISOString();
 
       const { error } = await supabase.from('incidents').update(updatePayload).eq('id', id);
       if (error) throw error;
       setIncidents((prev) =>
-        prev.map((i) => (i.id === id ? { ...i, ...data, id: i.id } : i)),
+        prev.map((i) => (i.id === id ? { ...i, ...data, updatedAt: new Date().toISOString(), id: i.id } : i)),
       );
     },
     [],
@@ -1131,7 +1162,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         .eq('id', appId);
       if (appError) throw appError;
 
-      // 2. Insert tenant
+      // 2. Insert tenant (lease_id: null to avoid FK violation)
       const { data: tenantRow, error: tenantError } = await supabase
         .from('tenants')
         .insert({
@@ -1144,10 +1175,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
           status: 'active',
           building_id: buildingId,
           apartment_id: apartmentId,
-          lease_id: leaseId,
+          lease_id: null,
           must_change_password: true,
           created_by: adminId,
           status_changed_at: timestamp,
+          promo_credits: 0,
+          notes: null,
+          emergency_contact: null,
+          emergency_phone: null,
         })
         .select()
         .single();
@@ -1169,6 +1204,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
           created_by: adminId,
         });
       if (leaseError) throw leaseError;
+
+      // 3b. Update tenant with lease_id now that lease exists
+      const { error: tenantLeaseError } = await supabase
+        .from('tenants')
+        .update({ lease_id: leaseId })
+        .eq('id', tenantId);
+      if (tenantLeaseError) throw tenantLeaseError;
 
       // 4. Update apartment
       const { error: aptError } = await supabase
@@ -1198,11 +1240,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
         status: tenantRow.status,
         buildingId: tenantRow.building_id,
         apartmentId: tenantRow.apartment_id,
-        leaseId: tenantRow.lease_id,
+        leaseId,
         mustChangePassword: tenantRow.must_change_password,
         createdAt: tenantRow.created_at,
         createdBy: tenantRow.created_by,
         statusChangedAt: tenantRow.status_changed_at,
+        updatedAt: null,
+        promoCredits: tenantRow.promo_credits ?? 0,
+        notes: tenantRow.notes ?? null,
+        emergencyContact: tenantRow.emergency_contact ?? null,
+        emergencyPhone: tenantRow.emergency_phone ?? null,
       };
 
       const newLease: Lease = {
@@ -1217,6 +1264,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         status: 'active',
         createdAt: timestamp,
         createdBy: adminId,
+        updatedAt: null,
       };
 
       // Batch state updates
@@ -1302,7 +1350,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   );
 
   const addPayment = useCallback(
-    async (data: Omit<Payment, 'id' | 'createdAt'>): Promise<Payment> => {
+    async (data: Omit<Payment, 'id' | 'createdAt' | 'updatedAt'>): Promise<Payment> => {
       const id = generatePaymentId(payments);
       const { data: row, error } = await supabase
         .from('payments')
@@ -1319,6 +1367,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           method: data.method,
           reference: data.reference,
           late_fee: data.lateFee,
+          proof_image_url: data.proofImageUrl ?? null,
         })
         .select()
         .single();
@@ -1336,7 +1385,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         method: row.method,
         reference: row.reference,
         lateFee: row.late_fee,
+        proofImageUrl: row.proof_image_url ?? null,
         createdAt: row.created_at,
+        updatedAt: row.updated_at ?? null,
       };
       setPayments((prev) => [...prev, newPayment]);
       return newPayment;
@@ -1358,11 +1409,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (data.method !== undefined) updatePayload.method = data.method;
       if (data.reference !== undefined) updatePayload.reference = data.reference;
       if (data.lateFee !== undefined) updatePayload.late_fee = data.lateFee;
+      if (data.proofImageUrl !== undefined) updatePayload.proof_image_url = data.proofImageUrl;
+      updatePayload.updated_at = new Date().toISOString();
 
       const { error } = await supabase.from('payments').update(updatePayload).eq('id', id);
       if (error) throw error;
       setPayments((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, ...data, id: p.id } : p)),
+        prev.map((p) => (p.id === id ? { ...p, ...data, updatedAt: new Date().toISOString(), id: p.id } : p)),
       );
     },
     [],
